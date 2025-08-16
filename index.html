@@ -1,0 +1,3186 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zdravotní Encyklopedie - Kompletní databáze nemocí</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10b981',
+                        secondary: '#059669',
+                        accent: '#34d399',
+                        muted: '#f3f4f6',
+                        'muted-foreground': '#6b7280',
+                        destructive: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .disease-card {
+            transition: all 0.3s ease;
+        }
+        .disease-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .hidden { display: none; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="cursor-pointer" onclick="window.location.href='index.html'">
+                        <h1 class="font-bold text-xl text-gray-900">Zdravotní Encyklopedie</h1>
+                        <p class="text-sm text-gray-600">Kompletní databáze nemocí</p>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <span id="diseaseCount">0</span> nemocí v databázi
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search and Filters -->
+    <section class="bg-white border-b">
+        <div class="container mx-auto px-4 py-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="relative mb-4">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Vyhledejte nemoc, příznak nebo kategorii..." 
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-primary text-white" data-category="all">
+                        Všechny nemoci
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Kardiovaskulární">
+                        Kardiovaskulární
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Neurologické">
+                        Neurologické
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Respirační">
+                        Respirační
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Metabolické">
+                        Metabolické
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Infekční">
+                        Infekční
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300" data-category="Autoimunitní">
+                        Autoimunitní
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Informace nenahrazují lékařskou konzultaci</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disease Grid -->
+    <main class="container mx-auto px-4 py-8">
+        <div id="diseaseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Diseases will be populated by JavaScript -->
+        </div>
+        
+        <div id="noResults" class="hidden text-center py-12">
+            <div class="text-gray-400 mb-4">
+                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.467-.881-6.08-2.33M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">Žádné výsledky</h3>
+            <p class="text-gray-500">Zkuste upravit vyhledávací kritéria</p>
+        </div>
+    </main>
+
+<!-- O nás / Kontakt -->
+<footer class="bg-white border-t mt-16 py-8">
+  <div class="container mx-auto px-4 max-w-2xl text-center">
+    <h2 class="text-xl font-bold text-gray-900 mb-2">O nás</h2>
+    <p class="text-gray-700 mb-2">Tento projekt jsem vytvořil za účelem pomoci lidem lépe se orientovat ve zdravotní problematice a poskytnout jim snadno dostupné informace o nemocech.</p>
+    <p class="text-gray-700 mb-4">Pokud máte dotazy nebo připomínky, neváhejte mě kontaktovat na <a href="mailto:frajeriss19@gmail.com" class="text-primary underline">frajeriss19@gmail.com</a>.</p>
+    <p class="text-xs text-gray-400">&copy; 2025 Zdravotní Encyklopedie</p>
+  </div>
+</footer>
+
+
+    <!-- Disease Detail Modal -->
+    <div id="diseaseModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="modalTitle" class="text-2xl font-bold text-gray-900"></h2>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kompletní databáze nemocí (bez duplicit)
+        const diseases = [
+
+    {
+        name: "AIDS",
+        category: "Infekční",
+        severity: "Velmi vážná",
+        symptoms: ["Úbytek hmotnosti", "Opakované infekce", "Noční pocení", "Únava", "Zvětšené uzliny"],
+        causes: ["Virus HIV", "Pohlavní styk", "Krevní přenos", "Z matky na dítě"],
+        treatment: ["Antiretrovirová terapie", "Podpůrná léčba infekcí"],
+        prevention: ["Bezpečný sex", "Testování krve", "Prevence přenosu"],
+        description: "Syndrom získané imunitní nedostatečnosti způsobený virem HIV, vedoucí k selhání imunitního systému."
+    },
+    {
+        name: "Absces",
+        category: "Infekční",
+        severity: "Střední",
+        symptoms: ["Zarudnutí", "Otékání", "Bolest", "Horečka", "Hnisavý výtok"],
+        causes: ["Bakteriální infekce (nejčastěji stafylokoky)", "Poranění kůže", "Zanícené vlasové folikuly"],
+        treatment: ["Chirurgické otevření a drenáž", "Antibiotika", "Dezinfekce"],
+        prevention: ["Hygiena", "Ošetření drobných poranění", "Vyhýbání se škrábání kůže"],
+        description: "Absces je dutina vyplněná hnisem, která vzniká v důsledku infekce a zánětu tkáně."
+    },
+    {
+        name: "Achondroplázie",
+        category: "Genetické",
+        severity: "Střední",
+        symptoms: ["Malý vzrůst", "Krátké končetiny", "Velká hlava", "Zkrácené prsty"],
+        causes: ["Genetická mutace FGFR3"],
+        treatment: ["Symptomatická léčba", "Ortopedická péče", "Fyzioterapie"],
+        prevention: ["Genetické poradenství"],
+        description: "Achondroplázie je nejčastější forma trpaslictví způsobená genetickou mutací, která ovlivňuje růst kostí."
+    },
+    {
+        name: "Addisonova choroba",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Chronická únava", "Ztráta hmotnosti", "Nízký krevní tlak", "Hyperpigmentace kůže", "Nechutenství", "Bolesti břicha", "Zvracení", "Svalová slabost"],
+        causes: ["Autoimunitní destrukce kůry nadledvin", "Infekce (např. tuberkulóza)", "Nádory nadledvin", "Krvácení do nadledvin"],
+        treatment: ["Doživotní substituce hormonů (kortikoidy, mineralokortikoidy)", "Léčba akutních krizí (hydrokortizon, infuze)", "Dieta s dostatkem soli"],
+        prevention: ["Včasná diagnostika a léčba základních příčin", "Pravidelné kontroly u endokrinologa"],
+        description: "Addisonova choroba je vzácné endokrinní onemocnění způsobené nedostatečnou funkcí kůry nadledvin. Projevuje se únavou, nízkým tlakem, tmavnutím kůže a rizikem Addisonovy krize. Léčba spočívá v doživotním podávání hormonů."
+    },
+    {
+        name: "Afty",
+        category: "Trávicí/Kožní",
+        severity: "Mírná",
+        symptoms: ["Bolestivé vřídky v ústech", "Pálení", "Obtížné polykání", "Citlivost při jídle"],
+        causes: ["Stres", "Poranění sliznice", "Nedostatek vitamínů (B12, kyselina listová)", "Imunitní reakce"],
+        treatment: ["Lokální gely", "Vyplachování úst", "Doplňky vitamínů", "Analgetika"],
+        prevention: ["Dostatek vitamínů", "Opatrné čištění zubů", "Vyhýbání se dráždivým potravinám"],
+        description: "Afty jsou malé bolestivé vřídky na sliznici dutiny ústní, často se opakují a mohou být způsobeny stresem, poraněním nebo nedostatkem vitamínů."
+    },
+    {
+        name: "Agorafobie",
+        category: "Psychiatrické",
+        severity: "Střední",
+        symptoms: ["Strach z otevřených prostor", "Panické ataky", "Vyhýbání se veřejným místům", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Trauma", "Genetická predispozice"],
+        treatment: ["Kognitivně-behaviorální terapie", "Medikace (antidepresiva, anxiolytika)"],
+        prevention: ["Stresový management", "Včasná psychologická intervence"],
+        description: "Agorafobie je úzkostná porucha charakterizovaná strachem z veřejných prostor nebo situací, kde by bylo obtížné uniknout."
+    },
+    {
+        name: "Akné",
+        category: "Kožní",
+        severity: "Mírná až střední",
+        symptoms: ["Pupínky", "Zanícené boláky", "Černé tečky", "Mastná pleť"],
+        causes: ["Hormonální změny", "Zvýšená produkce mazu", "Bakterie Cutibacterium acnes", "Genetika"],
+        treatment: ["Lokální přípravky s benzoylperoxidem", "Retinoidy", "Antibiotika", "Hormonální léčba"],
+        prevention: ["Pravidelná hygiena", "Vyhýbání se mastné kosmetice", "Zdravý životní styl"],
+        description: "Akné je chronické zánětlivé onemocnění mazových žláz a vlasových folikulů."
+    },
+    {
+        name: "Akutní glaukomový záchvat",
+        category: "Oční",
+        severity: "Vážná",
+        symptoms: ["Silná bolest oka", "Zarudnutí oka", "Rozmazané vidění", "Nevolnost", "Zvracení"],
+        causes: ["Náhlé zvýšení nitroočního tlaku", "Anatomické predispozice"],
+        treatment: ["Okamžité snížení nitroočního tlaku (léky, laser, operace)"],
+        prevention: ["Pravidelné oční kontroly u rizikových osob"],
+        description: "Akutní glaukomový záchvat je náhlý stav s prudkým zvýšením nitroočního tlaku, který může vést k trvalé ztrátě zraku."
+    },
+    {
+        name: "Akutní selhání ledvin",
+        category: "Ledviny",
+        severity: "Vážná",
+        symptoms: ["Oligurie (snížené močení)", "Otoky", "Únava", "Nevolnost", "Zvracení"],
+        causes: ["Náhlé poškození ledvin (toxiny, šok, infekce)", "Nedostatečné prokrvení ledvin"],
+        treatment: ["Léčba příčiny", "Dialýza", "Podpora životních funkcí"],
+        prevention: ["Prevence dehydratace", "Včasná léčba infekcí", "Opatrnost při užívání léků"],
+        description: "Akutní selhání ledvin je náhlá ztráta schopnosti ledvin filtrovat odpadní látky z krve."
+    },
+    {
+        name: "Albinismus",
+        category: "Genetické",
+        severity: "Mírná až střední",
+        symptoms: ["Světlá kůže", "Bílé nebo světlé vlasy", "Poruchy zraku", "Citlivost na slunce"],
+        causes: ["Genetická mutace ovlivňující tvorbu melaninu"],
+        treatment: ["Ochrana před sluncem", "Oční pomůcky", "Pravidelné oční kontroly"],
+        prevention: ["Nelze předcházet (genetická porucha)"],
+        description: "Albinismus je vrozená porucha tvorby pigmentu melaninu, která ovlivňuje barvu kůže, vlasů a očí."
+    },
+    {
+        name: "Alergie",
+        category: "Alergické",
+        severity: "Mírná až vážná",
+        symptoms: ["Kýchání", "Rýma", "Svědění", "Vyrážka", "Dušnost"],
+        causes: ["Imunitní reakce na alergeny (pyl, prach, potraviny, zvířata)"],
+        treatment: ["Antihistaminika", "Kortikosteroidy", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Imunoterapie"],
+        description: "Alergie je přehnaná reakce imunitního systému na běžné látky z okolí."
+    },
+    {
+        name: "Alergie na lepek",
+        category: "Alergické/Autoimunitní",
+        severity: "Střední",
+        symptoms: ["Průjem", "Nadýmání", "Bolest břicha", "Únava", "Hubnutí"],
+        causes: ["Imunitní reakce na lepek (gluten)"],
+        treatment: ["Bezlepková dieta"],
+        prevention: ["Vyhýbání se lepku ve stravě"],
+        description: "Alergie na lepek je imunitní reakce na bílkovinu obsaženou v obilninách, která může způsobit zažívací potíže a další příznaky."
+    },
+    {
+        name: "Alkoholismus",
+        category: "Psychiatrické/Metabolické",
+        severity: "Střední až vážná",
+        symptoms: ["Ztráta kontroly nad pitím", "Abstinenční příznaky", "Poškození jater", "Sociální problémy"],
+        causes: ["Dlouhodobé nadměrné užívání alkoholu", "Genetické a psychologické faktory"],
+        treatment: ["Psychoterapie", "Detoxikace", "Podpůrné skupiny (AA)", "Léky na snížení chuti"],
+        prevention: ["Omezení konzumace alkoholu", "Vzdělávání o rizicích"],
+        description: "Alkoholismus je chronické onemocnění charakterizované závislostí na alkoholu a jeho negativními dopady na zdraví a život."
+    },
+    {
+        name: "Alopecie",
+        category: "Kožní",
+        severity: "Mírná až střední",
+        symptoms: ["Vypadávání vlasů", "Řídké vlasy", "Holá místa na hlavě"],
+        causes: ["Autoimunitní reakce", "Genetické faktory", "Stres", "Hormonální změny"],
+        treatment: ["Kortikoidy", "Minoxidil", "Imunoterapie", "Transplantace vlasů"],
+        prevention: ["Omezení stresu", "Zdravý životní styl"],
+        description: "Alopecie je označení pro vypadávání vlasů, které může být způsobeno různými faktory včetně autoimunity a stresu."
+    },
+    {
+        name: "Alzheimerova choroba",
+        category: "Neurologické",
+        severity: "Střední až vážná",
+        symptoms: ["Ztráta paměti", "Zmatenost", "Poruchy řeči", "Změny osobnosti", "Problémy s orientací"],
+        causes: ["Degenerace mozkových buněk", "Genetické faktory", "Věk"],
+        treatment: ["Léky zpomalující průběh", "Kognitivní trénink", "Podpora rodiny"],
+        prevention: ["Zdravý životní styl", "Mentální aktivita", "Kontrola krevního tlaku"],
+        description: "Chronické a progresivní onemocnění mozku vedoucí k postupné ztrátě paměti a dalších kognitivních funkcí."
+    },
+    {
+        name: "Anafylaktický šok",
+        category: "Alergické/Imunitní",
+        severity: "Velmi vážná",
+        symptoms: ["Dušnost", "Otékání hrdla a jazyka", "Kopřivka", "Pokles krevního tlaku", "Zrychlený tep", "Zvracení", "Ztráta vědomí"],
+        causes: ["Alergie na potraviny", "Bodnutí hmyzem", "Léky", "Kontrastní látky"],
+        treatment: ["Okamžitá aplikace adrenalinu (epinefrinu)", "Podání antihistaminik a kortikoidů", "Podpora dýchání a krevního oběhu", "Volání záchranné služby"],
+        prevention: ["Vyhýbání se známým alergenům", "Nošení autoinjektoru adrenalinu (EpiPen) u rizikových osob"],
+        description: "Anafylaktický šok je život ohrožující akutní alergická reakce s rychlým rozvojem příznaků. Vyžaduje okamžitou lékařskou pomoc a podání adrenalinu."
+    },
+    {
+        name: "Andropauza",
+        category: "Endokrinní/Mužské zdraví",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Snížená sexuální touha", "Poruchy erekce", "Změny nálady", "Úbytek svalové hmoty", "Zvýšený podíl tělesného tuku", "Poruchy spánku"],
+        causes: ["Pokles hladiny testosteronu s věkem", "Chronická onemocnění", "Stres"],
+        treatment: ["Hormonální substituční terapie (v indikovaných případech)", "Zdravý životní styl", "Psychologická podpora"],
+        prevention: ["Zdravý životní styl", "Pravidelný pohyb", "Prevence obezity a chronických onemocnění"],
+        description: "Andropauza označuje soubor příznaků spojených s poklesem hladiny testosteronu u mužů ve středním a vyšším věku. Projevuje se únavou, poklesem libida a změnami nálady."
+    },
+    {
+        name: "Aneurysma",
+        category: "Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Často bez příznaků", "Bolest v postižené oblasti", "Pulsující útvar"],
+        causes: ["Oslabení cévní stěny", "Vysoký krevní tlak", "Ateroskleróza"],
+        treatment: ["Chirurgický zákrok", "Sledování", "Léky na snížení tlaku"],
+        prevention: ["Kontrola krevního tlaku", "Zdravý životní styl"],
+        description: "Aneurysma je vakovité rozšíření cévy, které může prasknout a způsobit krvácení."
+    },
+    {
+        name: "Angina pectoris",
+        category: "Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Bolest na hrudi", "Dušnost", "Pocení", "Úzkost"],
+        causes: ["Nedostatečné prokrvení srdečního svalu", "Ateroskleróza"],
+        treatment: ["Nitroglycerin", "Léky na snížení krevního tlaku", "Změna životního stylu"],
+        prevention: ["Zdravá strava", "Pohyb", "Léčba vysokého tlaku a cholesterolu"],
+        description: "Angina pectoris je bolest na hrudi způsobená nedostatečným přísunem kyslíku do srdečního svalu."
+    },
+    {
+        name: "Anémie",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce", "Závratě"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění", "Genetické poruchy"],
+        treatment: ["Doplňky železa", "Léčba základní příčiny", "Transfuze (v těžkých případech)"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Arachnofóbie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Intenzivní strach z pavouků", "Úzkost", "Panické ataky"],
+        causes: ["Negativní zkušenost", "Genetická predispozice", "Psychologické faktory"],
+        treatment: ["Kognitivně-behaviorální terapie", "Expozice", "Relaxační techniky"],
+        prevention: ["Včasná psychologická intervence"],
+        description: "Arachnofobie je specifická fobie, tedy chorobný strach z pavouků."
+    },
+    {
+        name: "Artróza (osteoartróza)",
+        category: "Ortopedické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest kloubů", "Ztuhlost", "Omezená pohyblivost", "Otékání"],
+        causes: ["Opotřebení kloubní chrupavky", "Věk", "Nadváha", "Poranění"],
+        treatment: ["Fyzioterapie", "Analgetika", "Chirurgická léčba (endoprotéza)"],
+        prevention: ["Udržování zdravé hmotnosti", "Pravidelný pohyb"],
+        description: "Artróza je degenerativní onemocnění kloubů způsobené opotřebením chrupavky."
+    },
+    {
+        name: "Arytmie",
+        category: "Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Nepravidelný srdeční tep", "Bušení srdce", "Slabost", "Závratě"],
+        causes: ["Poruchy elektrické aktivity srdce", "Infarkt", "Vysoký krevní tlak", "Kardiomyopatie"],
+        treatment: ["Antiarytmika", "Kardiostimulátor", "Ablace", "Změna životního stylu"],
+        prevention: ["Léčba hypertenze", "Zdravý životní styl", "Omezení alkoholu"],
+        description: "Arytmie je porucha srdečního rytmu, která může být neškodná i život ohrožující."
+    },
+    {
+        name: "Aspergerův syndrom",
+        category: "Neurologické",
+        severity: "Mírná až střední",
+        symptoms: ["Potíže v sociální komunikaci", "Opakující se zájmy", "Potíže s empatií"],
+        causes: ["Genetické faktory", "Neznámé příčiny"],
+        treatment: ["Speciální vzdělávání", "Podpora sociálních dovedností", "Psychoterapie"],
+        prevention: ["Nelze předcházet"],
+        description: "Aspergerův syndrom je porucha autistického spektra s potížemi v sociální interakci."
+    },
+    {
+        name: "Astigmatismus",
+        category: "Oční",
+        severity: "Mírná až střední",
+        symptoms: ["Rozmazané vidění", "Bolest hlavy", "Únava očí"],
+        causes: ["Nerovnoměrné zakřivení rohovky nebo čočky"],
+        treatment: ["Brýle", "Kontaktní čočky", "Laserová operace"],
+        prevention: ["Nelze předcházet (vrozené nebo získané)"],
+        description: "Astigmatismus je oční vada způsobující rozmazané nebo deformované vidění."
+    },
+    {
+        name: "Astma (Asthma bronchiale)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Sípání", "Kašel", "Tlak na hrudi"],
+        causes: ["Alergeny", "Infekce", "Fyzická zátěž", "Studený vzduch"],
+        treatment: ["Inhalační kortikoidy", "Bronchodilatancia", "Vyhýbání se spouštěčům"],
+        prevention: ["Vyhýbat se alergenům", "Pravidelná léčba", "Monitorování stavu"],
+        description: "Chronické zánětlivé onemocnění dýchacích cest projevujícím se opakovanými záchvaty dušnosti a kašle."
+    },
+    {
+        name: "ADD (porucha pozornosti bez hyperaktivity)",
+        category: "Psychiatrické/Neurologické",
+        severity: "Mírná až střední",
+        symptoms: ["Nevšímavost", "Zapomnětlivost", "Neschopnost se soustředit", "Snadné rozptýlení", "Nedokončování úkolů"],
+        causes: ["Genetické faktory", "Nerovnováha neurotransmiterů v mozku", "Vliv prostředí"],
+        treatment: ["Psychoterapie", "Speciální pedagogické přístupy", "Organizační strategie", "Někdy medikace (stimulancia)"],
+        prevention: ["Nelze jednoznačně předcházet (genetická predispozice)", "Podpora struktury a režimu v dětství"],
+        description: "ADD je neurovývojová porucha charakterizovaná především poruchou pozornosti bez výrazné hyperaktivity. Projevuje se zapomnětlivostí a nesoustředěností, často už od dětství. Léčba je převážně nefarmakologická, zaměřená na podporu organizace a koncentrace."
+    },
+    {
+        name: "ADHD (porucha pozornosti s hyperaktivitou)",
+        category: "Psychiatrické/Neurologické",
+        severity: "Mírná až střední",
+        symptoms: ["Nevšímavost", "Hyperaktivita", "Impulzivita", "Neschopnost dokončit úkoly", "Snadné rozptýlení", "Problémy s organizací"],
+        causes: ["Genetické faktory", "Nerovnováha neurotransmiterů v mozku", "Vliv prostředí"],
+        treatment: ["Psychoterapie", "Speciální pedagogické přístupy", "Medikace (stimulancia, atomoxetin)", "Podpora rodiny a školy"],
+        prevention: ["Nelze jednoznačně předcházet (genetická predispozice)", "Podpora struktury a režimu v dětství"],
+        description: "ADHD je neurovývojová porucha s hlavními příznaky nepozornosti, hyperaktivity a impulzivity. Projevuje se již v dětství a často přetrvává do dospělosti. Léčba je kombinací psychoterapie, speciálních pedagogických přístupů a v některých případech i medikace."
+    },
+    {
+        name: "Ateroskleróza",
+        category: "Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Bolest na hrudi (angina pectoris)", "Dušnost", "Únava", "Slabost končetin", "Poruchy paměti (při postižení mozku)", "Infarkt myokardu", "Mrtvice"],
+        causes: ["Ukládání tukových látek do stěn tepen", "Vysoký cholesterol", "Vysoký krevní tlak", "Kouření", "Cukrovka", "Genetická predispozice"],
+        treatment: ["Léky na snížení cholesterolu", "Léky na snížení krevního tlaku", "Změna životního stylu", "Chirurgické zákroky (bypass, stent)", "Dieta"],
+        prevention: ["Zdravá strava", "Pravidelný pohyb", "Nekouřit", "Kontrola krevního tlaku a cholesterolu"],
+        description: "Ateroskleróza je chronické onemocnění tepen způsobené ukládáním tukových látek do jejich stěn. Může vést k infarktu, mrtvici a dalším komplikacím."
+    },
+    {
+        name: "Atopický ekzém",
+        category: "Kožní/Alergické",
+        severity: "Mírná až střední",
+        symptoms: ["Svědění kůže", "Zarudnutí", "Suchá a šupinatá kůže", "Ekzematické ložiska", "Praskliny a mokvání"],
+        causes: ["Genetická predispozice", "Porucha kožní bariéry", "Alergeny (prach, pyl, potraviny)", "Stres"],
+        treatment: ["Hydratační krémy", "Kortikosteroidní masti", "Antihistaminika", "Vyhýbání se alergenům", "Imunomodulační léčba"],
+        prevention: ["Pravidelná hydratace kůže", "Vyhýbání se známým alergenům", "Omezení stresu"],
+        description: "Atopický ekzém je chronické zánětlivé kožní onemocnění s typickým svěděním a suchostí kůže. Často začíná v dětství a má sklon k recidivám."
+    },
+    {
+        name: "Autismus",
+        category: "Psychiatrické/Neurologické",
+        severity: "Mírná až střední",
+        symptoms: ["Potíže v sociální komunikaci", "Opakující se vzorce chování", "Omezené zájmy", "Potíže s empatií", "Někdy opožděný vývoj řeči"],
+        causes: ["Genetické faktory", "Poruchy vývoje mozku", "Vliv prostředí (méně významný)"],
+        treatment: ["Speciální vzdělávání", "Podpora sociálních dovedností", "Behaviorální terapie", "Podpora rodiny"],
+        prevention: ["Nelze jednoznačně předcházet (genetická predispozice)"],
+        description: "Autismus je neurovývojová porucha charakterizovaná obtížemi v sociální interakci, komunikaci a stereotypním chováním. Projevy jsou velmi různorodé a individuální."
+    },
+    {
+        name: "Avitaminóza",
+        category: "Metabolické/Nutriční",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Poruchy růstu", "Kožní změny", "Poruchy imunity", "Poruchy zraku (např. šeroslepost u nedostatku vitamínu A)", "Krvácení (u nedostatku vitamínu K)", "Poruchy nervového systému"],
+        causes: ["Nedostatek jednoho nebo více vitamínů ve stravě", "Poruchy vstřebávání (malabsorpce)", "Zvýšená potřeba vitamínů (těhotenství, růst)"],
+        treatment: ["Podávání chybějících vitamínů", "Úprava stravy", "Léčba základní příčiny malabsorpce"],
+        prevention: ["Vyvážená strava", "Dostatečný příjem vitamínů", "Prevence malabsorpce"],
+        description: "Avitaminóza je onemocnění způsobené nedostatkem vitamínů. Projevy závisí na konkrétním chybějícím vitamínu a mohou být velmi pestré."
+    },
+    {
+        name: "Barotrauma",
+        category: "Respirační/Ortopedické",
+        severity: "Střední",
+        symptoms: ["Bolest ucha", "Bolest hlavy", "Závratě", "Ztráta sluchu", "Krvácení z nosu"],
+        causes: ["Rychlá změna tlaku (potápění, létání)", "Ucpání Eustachovy trubice"],
+        treatment: ["Vyrovnání tlaku", "Nosní kapky", "Chirurgické ošetření v těžkých případech"],
+        prevention: ["Pomalé změny tlaku", "Použití ušních špuntů", "Vyhýbat se potápění při rýmě"],
+        description: "Poškození tkání způsobené rozdílem tlaku mezi vnějším prostředím a tělesnými dutinami, často při potápění nebo létání."
+    },
+    {
+        name: "Barvoslepost (Daltonismus)",
+        category: "Oční/Genetické",
+        severity: "Mírná",
+        symptoms: ["Neschopnost rozlišit některé barvy", "Problémy s orientací v barevných schématech"],
+        causes: ["Genetická vada", "Poškození sítnice"],
+        treatment: ["Speciální brýle", "Žádná kauzální léčba"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Porucha vnímání barev, nejčastěji vrozená, postihuje hlavně muže."
+    },
+    {
+        name: "Basaliom",
+        category: "Onkologické/Kožní",
+        severity: "Střední",
+        symptoms: ["Nehojící se vřed", "Růžový nebo perleťový uzlík na kůži", "Krvácení"],
+        causes: ["Dlouhodobé vystavení UV záření", "Genetická predispozice"],
+        treatment: ["Chirurgické odstranění", "Kryoterapie", "Radioterapie"],
+        prevention: ["Ochrana před sluncem", "Používání opalovacích krémů"],
+        description: "Nejčastější typ rakoviny kůže, roste pomalu a málokdy metastazuje."
+    },
+    {
+        name: "Bechtěrevova choroba",
+        category: "Revmatologické/Autoimunitní",
+        severity: "Střední až vážná",
+        symptoms: ["Bolest zad", "Ztuhlost páteře", "Omezená pohyblivost", "Únava"],
+        causes: ["Autoimunitní reakce", "Genetická predispozice (HLA-B27)"],
+        treatment: ["Fyzioterapie", "Nesteroidní antirevmatika", "Biologická léčba"],
+        prevention: ["Pravidelný pohyb", "Včasná léčba"],
+        description: "Chronické zánětlivé onemocnění páteře a kloubů, vede k jejich ztuhnutí."
+    },
+    {
+        name: "Bellova obrna",
+        category: "Neurologické",
+        severity: "Střední",
+        symptoms: ["Ochrnutí jedné strany obličeje", "Porucha mimiky", "Slzení oka", "Porucha chuti"],
+        causes: ["Zánět lícního nervu", "Virová infekce (herpes simplex)"],
+        treatment: ["Kortikosteroidy", "Fyzioterapie", "Ochrana oka"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Náhlé ochrnutí svalů jedné poloviny obličeje, většinou dočasné."
+    },
+    {
+        name: "Bércové vředy",
+        category: "Kožní/Cévní",
+        severity: "Střední až vážná",
+        symptoms: ["Otevřená rána na bérci", "Bolest", "Zápach", "Sekrece"],
+        causes: ["Chronická žilní nedostatečnost", "Cukrovka", "Poranění"],
+        treatment: ["Komprese", "Masti", "Chirurgické ošetření", "Léčba základní příčiny"],
+        prevention: ["Léčba žilních onemocnění", "Péče o kůži", "Pravidelný pohyb"],
+        description: "Chronické nehojící se rány na dolních končetinách, často u starších osob."
+    },
+    {
+        name: "Bipolární afektivní porucha",
+        category: "Psychiatrické",
+        severity: "Střední až vážná",
+        symptoms: ["Střídání manických a depresivních epizod", "Poruchy spánku", "Impulzivita"],
+        causes: ["Genetické faktory", "Stres", "Nerovnováha neurotransmiterů"],
+        treatment: ["Stabilizátory nálady", "Psychoterapie", "Antidepresiva"],
+        prevention: ["Včasná léčba", "Podpora okolí"],
+        description: "Duševní onemocnění charakterizované střídáním období mánie a deprese."
+    },
+    {
+        name: "Bolest břicha",
+        category: "Symptomatické",
+        severity: "Mírná až vážná",
+        symptoms: ["Bolest v oblasti břicha", "Křeče", "Nadýmání", "Nevolnost"],
+        causes: ["Trávicí potíže", "Infekce", "Stres", "Záněty", "Poruchy orgánů"],
+        treatment: ["Léčba příčiny", "Analgetika", "Dieta"],
+        prevention: ["Zdravá strava", "Prevence infekcí"],
+        description: "Bolest v oblasti břicha může mít mnoho příčin, od banálních po závažné."
+    },
+    {
+        name: "Bolest hlavy",
+        category: "Symptomatické/Neurologické",
+        severity: "Mírná až střední",
+        symptoms: ["Tlak v hlavě", "Pulzující bolest", "Citlivost na světlo", "Nevolnost"],
+        causes: ["Stres", "Migréna", "Napětí", "Infekce", "Úraz"],
+        treatment: ["Analgetika", "Odpočinek", "Hydratace", "Léčba příčiny"],
+        prevention: ["Dostatek spánku", "Vyhýbat se stresu", "Pravidelný režim"],
+        description: "Bolest hlavy je častý příznak, který může mít mnoho různých příčin."
+    },
+    {
+        name: "Bolest kloubů",
+        category: "Symptomatické/Ortopedické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest při pohybu", "Otok", "Ztuhlost", "Omezená pohyblivost"],
+        causes: ["Artróza", "Artritida", "Poranění", "Přetížení"],
+        treatment: ["Analgetika", "Fyzioterapie", "Chladivé obklady", "Léčba základní příčiny"],
+        prevention: ["Pravidelný pohyb", "Vyhýbat se přetížení"],
+        description: "Bolest kloubů může být způsobena zánětem, opotřebením nebo úrazem."
+    },
+    {
+        name: "Bolest v krku",
+        category: "Symptomatické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Škrábání v krku", "Bolest při polykání", "Zarudnutí", "Kašel"],
+        causes: ["Virová infekce", "Bakteriální infekce", "Alergie"],
+        treatment: ["Klid", "Tekutiny", "Pastilky", "Antibiotika (u bakteriální příčiny)"],
+        prevention: ["Hygiena", "Vyhýbat se nemocným"],
+        description: "Bolest v krku je častý příznak infekcí horních cest dýchacích."
+    },
+    {
+        name: "Bolest zad",
+        category: "Symptomatické/Ortopedické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest v bederní oblasti", "Ztuhlost", "Omezená pohyblivost"],
+        causes: ["Přetížení", "Špatné držení těla", "Výhřez ploténky", "Artróza"],
+        treatment: ["Fyzioterapie", "Analgetika", "Cvičení", "Odpočinek"],
+        prevention: ["Správné držení těla", "Pravidelný pohyb"],
+        description: "Bolest zad je velmi častý problém, často způsobený přetížením nebo špatným držením těla."
+    },
+    {
+        name: "Bolest zubů",
+        category: "Symptomatické/Stomatologické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest při kousání", "Citlivost na teplo a chlad", "Otok dásní"],
+        causes: ["Zubní kaz", "Zánět dásní", "Absces", "Poranění"],
+        treatment: ["Ošetření zubařem", "Analgetika", "Antibiotika", "Léčba základní příčiny"],
+        prevention: ["Pravidelná hygiena", "Pravidelné kontroly u zubaře"],
+        description: "Bolest zubů je nejčastěji způsobena zubním kazem nebo zánětem."
+    },
+    {
+        name: "Borelióza (Lymská borelióza)",
+        category: "Infekční",
+        severity: "Střední",
+        symptoms: ["Červená skvrna po kousnutí klíštětem", "Únava", "Bolest kloubů", "Horečka"],
+        causes: ["Bakterie Borrelia burgdorferi", "Kousnutí infikovaným klíštětem"],
+        treatment: ["Antibiotika", "Symptomatická léčba"],
+        prevention: ["Používání repelentů", "Prohlídka těla po pobytu v přírodě"],
+        description: "Infekční onemocnění přenášené klíšťaty, může postihnout klouby, nervy i srdce."
+    },
+    {
+        name: "Botulismus",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Ochrnutí svalů", "Poruchy vidění", "Poruchy polykání", "Dušnost"],
+        causes: ["Toxin bakterie Clostridium botulinum", "Konzumace kontaminovaných potravin"],
+        treatment: ["Podání antitoxinu", "Podpora dýchání", "Hospitalizace"],
+        prevention: ["Správné konzervování potravin", "Dodržování hygieny"],
+        description: "Vzácné, ale závažné onemocnění způsobené toxinem, který blokuje nervosvalový přenos."
+    },
+    {
+        name: "Bradavice",
+        category: "Kožní/Infekční",
+        severity: "Mírná",
+        symptoms: ["Tvrdé výrůstky na kůži", "Drsný povrch", "Bolest při tlaku"],
+        causes: ["Infekce lidským papilomavirem (HPV)"],
+        treatment: ["Kryoterapie", "Masti", "Chirurgické odstranění"],
+        prevention: ["Hygiena", "Vyhýbat se kontaktu s infikovanými povrchy"],
+        description: "Nezhoubné kožní výrůstky způsobené infekcí HPV."
+    },
+    {
+        name: "Bradykardie",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Pomalý srdeční tep", "Únava", "Závratě", "Slabost"],
+        causes: ["Porucha převodního systému srdce", "Léky", "Stárnutí"],
+        treatment: ["Léčba základní příčiny", "Kardiostimulátor (v těžkých případech)"],
+        prevention: ["Kontrola léků", "Pravidelné kontroly u kardiologa"],
+        description: "Zpomalení srdečního tepu pod 60/min, může být fyziologické i patologické."
+    },
+    {
+        name: "Brániční kýla",
+        category: "Chirurgické",
+        severity: "Střední",
+        symptoms: ["Pálení žáhy", "Bolest na hrudi", "Dušnost", "Regurgitace"],
+        causes: ["Oslabení bránice", "Nadváha", "Těhotenství"],
+        treatment: ["Chirurgická léčba", "Dieta", "Léky na snížení kyselosti"],
+        prevention: ["Udržování zdravé hmotnosti", "Vyhýbat se zvedání těžkých břemen"],
+        description: "Vystoupení části žaludku do hrudníku skrz bránici."
+    },
+    {
+        name: "Bronchitida",
+        category: "Respirační/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Vykašlávání hlenu", "Dušnost", "Horečka"],
+        causes: ["Virová infekce", "Bakteriální infekce", "Kouření"],
+        treatment: ["Klid", "Tekutiny", "Léky na kašel", "Antibiotika (u bakteriální příčiny)"],
+        prevention: ["Vyhýbat se kouření", "Hygiena", "Očkování proti chřipce"],
+        description: "Zánět průdušek, často virového původu, projevuje se kašlem a dušností."
+    },
+    {
+        name: "Břišní tyfus",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka", "Bolest břicha", "Průjem nebo zácpa", "Vyrážka"],
+        causes: ["Bakterie Salmonella typhi", "Kontaminovaná voda nebo potraviny"],
+        treatment: ["Antibiotika", "Rehydratace", "Klid na lůžku"],
+        prevention: ["Očkování", "Dodržování hygieny", "Bezpečná voda a potraviny"],
+        description: "Závažné infekční onemocnění trávicího traktu, přenášené kontaminovanou vodou a potravinami."
+    },
+    {
+        name: "Bulimie",
+        category: "Psychiatrické",
+        severity: "Střední až vážná",
+        symptoms: ["Záchvatovité přejídání", "Zvracení", "Používání projímadel", "Kolísání hmotnosti", "Poruchy elektrolytů"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí", "Sociální tlak"],
+        treatment: ["Psychoterapie", "Nutriční poradenství", "Léky (antidepresiva)"],
+        prevention: ["Podpora zdravého sebevědomí", "Včasná intervence při poruchách příjmu potravy"],
+        description: "Bulimie je porucha příjmu potravy charakterizovaná opakovanými epizodami přejídání a následným kompenzačním chováním (zvracení, projímadla)."
+    },
+    {
+        name: "Bulka v prsu",
+        category: "Onkologické/Gynekologické",
+        severity: "Střední až vážná",
+        symptoms: ["Hmatná bulka", "Změny tvaru prsu", "Vtahování kůže", "Sekrece z bradavky"],
+        causes: ["Benigní cysta", "Fibroadenom", "Rakovina prsu"],
+        treatment: ["Vyšetření lékařem", "Chirurgické odstranění", "Onkologická léčba (u malignity)"],
+        prevention: ["Pravidelné samovyšetření", "Preventivní mamografie"],
+        description: "Bulka v prsu může být nezhoubná i zhoubná, vždy je nutné odborné vyšetření."
+    },
+    {
+        name: "Celiakie",
+        category: "Autoimunitní",
+        severity: "Střední",
+        symptoms: ["Průjem", "Nadýmání", "Hubnutí", "Únava", "Kožní vyrážka"],
+        causes: ["Imunitní reakce na lepek", "Genetická predispozice"],
+        treatment: ["Bezlepková dieta", "Doplňky vitamínů a minerálů"],
+        prevention: ["Vyhýbání se lepku ve stravě"],
+        description: "Celiakie je autoimunitní onemocnění způsobené nesnášenlivostí lepku, vede k poškození střevní sliznice."
+    },
+    {
+        name: "Celulitida",
+        category: "Kožní",
+        severity: "Mírná",
+        symptoms: ["Zarudnutí kůže", "Otok", "Bolest", "Zvýšená teplota kůže"],
+        causes: ["Bakteriální infekce (streptokoky, stafylokoky)", "Poranění kůže"],
+        treatment: ["Antibiotika", "Klid", "Zvednutí postižené končetiny"],
+        prevention: ["Péče o kůži", "Ošetření ran", "Hygiena"],
+        description: "Celulitida je bakteriální zánět podkoží, projevuje se zarudnutím, otokem a bolestí."
+    },
+    {
+        name: "Cévní mozková příhoda",
+        category: "Neurologické",
+        severity: "Vážná",
+        symptoms: ["Ochrnutí končetin", "Porucha řeči", "Pokles koutku", "Porucha vědomí"],
+        causes: ["Ucpání cévy (ischemická)", "Krvácení do mozku (hemoragická)", "Vysoký krevní tlak"],
+        treatment: ["Rychlá hospitalizace", "Trombolýza", "Rehabilitace"],
+        prevention: ["Kontrola krevního tlaku", "Zdravý životní styl", "Léčba srdečních onemocnění"],
+        description: "Cévní mozková příhoda (mrtvice) je náhlé postižení mozku nedostatkem kyslíku nebo krvácením."
+    },
+    {
+        name: "Cirhóza jater",
+        category: "Gastroenterologické",
+        severity: "Střední až vážná",
+        symptoms: ["Únava", "Žloutenka", "Otoky", "Poruchy vědomí", "Krvácení"],
+        causes: ["Chronický alkoholismus", "Virová hepatitida", "Toxiny", "Autoimunitní onemocnění"],
+        treatment: ["Léčba příčiny", "Dieta", "Transplantace jater (v těžkých případech)"],
+        prevention: ["Omezení alkoholu", "Očkování proti hepatitidě", "Zdravý životní styl"],
+        description: "Cirhóza je chronické poškození jaterní tkáně, které vede k selhání jater."
+    },
+    {
+        name: "Cluster headache",
+        category: "Neurologické",
+        severity: "Střední až vážná",
+        symptoms: ["Intenzivní bolest hlavy", "Slzení oka", "Ucpaný nos", "Nevolnost"],
+        causes: ["Není zcela objasněno", "Genetické faktory", "Poruchy nervového systému"],
+        treatment: ["Inhalace kyslíku", "Triptany", "Preventivní léčba"],
+        prevention: ["Vyhýbat se spouštěčům (alkohol, stres)"],
+        description: "Cluster headache je velmi silná, záchvatovitá bolest hlavy, často v okolí oka."
+    },
+    {
+        name: "Creutzfeldt – Jakobova nemoc",
+        category: "Neurologické",
+        severity: "Vážná",
+        symptoms: ["Rychle progredující demence", "Poruchy pohybu", "Ztráta paměti", "Křeče"],
+        causes: ["Priony (abnormální bílkoviny)", "Genetické mutace", "Přenos kontaminovanou tkání"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče"],
+        prevention: ["Bezpečné zacházení s biologickým materiálem"],
+        description: "Vzácné, smrtelné neurodegenerativní onemocnění způsobené priony."
+    },
+    {
+        name: "Crohnova choroba",
+        category: "Autoimunitní",
+        severity: "Střední až vážná",
+        symptoms: ["Bolest břicha", "Průjem", "Hubnutí", "Únava", "Krvácení z konečníku"],
+        causes: ["Autoimunitní procesy", "Genetické faktory", "Stres"],
+        treatment: ["Imunosupresiva", "Kortikoidy", "Dieta", "Chirurgická léčba (v některých případech)"],
+        prevention: ["Zdravý životní styl", "Vyhýbat se stresu"],
+        description: "Chronické zánětlivé onemocnění trávicího traktu s autoimunitním podkladem."
+    },
+    {
+        name: "Cukrovka (diabetes)",
+        category: "Metabolické",
+        severity: "Střední až vážná",
+        symptoms: ["Časté močení", "Žízeň", "Únava", "Ztráta hmotnosti", "Zhoršené hojení ran"],
+        causes: ["Nedostatek inzulínu", "Inzulínová rezistence", "Autoimunitní procesy (typ 1)", "Životní styl (typ 2)"],
+        treatment: ["Inzulín", "Perorální antidiabetika", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Kontrola hmotnosti", "Pravidelná fyzická aktivita"],
+        description: "Chronické onemocnění charakterizované zvýšenou hladinou glukózy v krvi způsobenou poruchou tvorby nebo účinku inzulínu."
+    },
+    {
+        name: "Cushingův syndrom",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Přibývání na váze", "Měsíčkovitý obličej", "Svalová slabost", "Vysoký krevní tlak"],
+        causes: ["Nadměrná produkce kortizolu", "Nádor hypofýzy nebo nadledvin", "Dlouhodobé užívání kortikoidů"],
+        treatment: ["Chirurgické odstranění nádoru", "Snížení dávky kortikoidů", "Léky snižující tvorbu kortizolu"],
+        prevention: ["Opatrnost při užívání kortikoidů", "Pravidelné kontroly u lékaře"],
+        description: "Cushingův syndrom je stav způsobený nadbytkem hormonu kortizolu v těle."
+    },
+    {
+        name: "Cyanóza",
+        category: "Kardiovaskulární/Respirační",
+        severity: "Střední",
+        symptoms: ["Namodralé zbarvení kůže a sliznic", "Dušnost", "Únava"],
+        causes: ["Nedostatek kyslíku v krvi", "Srdeční nebo plicní onemocnění"],
+        treatment: ["Léčba základní příčiny", "Podávání kyslíku"],
+        prevention: ["Prevence srdečních a plicních onemocnění"],
+        description: "Cyanóza je modravé zbarvení kůže způsobené nedostatkem kyslíku v krvi."
+    },
+    {
+        name: "Cysta",
+        category: "Chirurgické/Onkologické",
+        severity: "Mírná až střední",
+        symptoms: ["Hmatná bulka", "Bolest", "Otékání", "Někdy bez příznaků"],
+        causes: ["Ucpání žlázy", "Zánět", "Genetické faktory"],
+        treatment: ["Chirurgické odstranění", "Pozorování (u malých cyst)"],
+        prevention: ["Nelze vždy předcházet"],
+        description: "Cysta je dutina vyplněná tekutinou nebo polotuhým obsahem, může vzniknout v různých tkáních."
+    },
+    {
+        name: "Cystická fibróza",
+        category: "Genetické",
+        severity: "Vážná",
+        symptoms: ["Chronický kašel", "Opakované infekce dýchacích cest", "Špatné trávení", "Slaný pot"],
+        causes: ["Mutace CFTR genu", "Dědičnost autosomálně recesivní"],
+        treatment: ["Inhalace", "Antibiotika", "Enzymy", "Fyzioterapie"],
+        prevention: ["Prenatální diagnostika", "Genetické poradenství"],
+        description: "Cystická fibróza je dědičné onemocnění postihující plíce a trávicí trakt, vede k tvorbě hustého hlenu."
+    },
+    {
+        name: "Cytomegalovirová infekce",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Únava", "Bolest svalů", "Zvětšené uzliny"],
+        causes: ["Virus CMV (herpetická skupina)", "Kapénková infekce", "Transplantace orgánů"],
+        treatment: ["Antivirotika (u oslabených jedinců)", "Symptomatická léčba"],
+        prevention: ["Hygiena", "Opatrnost při kontaktu s tělními tekutinami"],
+        description: "Infekce virem CMV je běžná, většinou probíhá mírně, ale může být nebezpečná pro imunokompromitované osoby."
+    },
+    {
+        name: "Časté močení u mužů",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Slabý proud moči"],
+        causes: ["Zvětšená prostata", "Infekce močových cest", "Cukrovka"],
+        treatment: ["Léčba základní příčiny", "Léky na prostatu", "Antibiotika (u infekce)"],
+        prevention: ["Pravidelné kontroly u urologa", "Dostatek tekutin"],
+        description: "Časté močení u mužů je častý příznak, nejčastěji způsobený zvětšenou prostatou nebo infekcí."
+    },
+    {
+        name: "Časté močení u žen",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Pálení při močení", "Nutkání na močení"],
+        causes: ["Infekce močových cest", "Cukrovka", "Dráždivý močový měchýř"],
+        treatment: ["Antibiotika (u infekce)", "Léčba základní příčiny"],
+        prevention: ["Dostatek tekutin", "Hygiena"],
+        description: "Časté močení u žen je nejčastěji způsobeno infekcí močových cest nebo dráždivým měchýřem."
+    },
+    {
+        name: "Černý kašel",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Záchvatovitý kašel", "Zvracení po kašli", "Horečka", "Únava"],
+        causes: ["Bakterie Bordetella pertussis", "Kapénková infekce"],
+        treatment: ["Antibiotika", "Symptomatická léčba", "Izolace nemocného"],
+        prevention: ["Očkování", "Hygiena"],
+        description: "Černý kašel je vysoce nakažlivé bakteriální onemocnění dýchacích cest, nebezpečné hlavně pro děti."
+    },
+    {
+        name: "Červené oči",
+        category: "Oční",
+        severity: "Mírná",
+        symptoms: ["Zarudnutí spojivek", "Svědění", "Slzení", "Pálení"],
+        causes: ["Alergie", "Infekce", "Únava očí", "Suchý vzduch"],
+        treatment: ["Oční kapky", "Vyhýbat se dráždivým látkám", "Léčba infekce"],
+        prevention: ["Hygiena rukou", "Omezení kontaktu s alergeny"],
+        description: "Červené oči jsou častým příznakem podráždění, alergie nebo infekce spojivek."
+    },
+    {
+        name: "Dehydratace",
+        category: "Metabolické",
+        severity: "Střední až vážná",
+        symptoms: ["Sucho v ústech", "Žízeň", "Únava", "Závratě", "Tmavá moč"],
+        causes: ["Nedostatek tekutin", "Průjem", "Zvracení", "Nadměrné pocení"],
+        treatment: ["Dostatek tekutin", "Rehydratační roztoky", "Léčba příčiny"],
+        prevention: ["Pravidelný příjem tekutin", "Prevence průjmu a zvracení"],
+        description: "Dehydratace je stav, kdy tělo ztrácí více tekutin, než přijímá, což může být nebezpečné hlavně u dětí a starších osob."
+    },
+    {
+        name: "Dekompresní nemoc",
+        category: "Chirurgické/Ortopedické",
+        severity: "Střední až vážná",
+        symptoms: ["Bolest kloubů", "Závratě", "Dušnost", "Poruchy vědomí"],
+        causes: ["Rychlý výstup při potápění", "Tvorba bublinek dusíku v krvi"],
+        treatment: ["Hyperbarická komora", "Podpora dýchání", "Léčba příznaků"],
+        prevention: ["Pomalý výstup při potápění", "Dodržování bezpečnostních pravidel"],
+        description: "Dekompresní nemoc vzniká při rychlém poklesu tlaku, kdy se v krvi tvoří bubliny plynu."
+    },
+    {
+        name: "Delirium tremens",
+        category: "Psychiatrické",
+        severity: "Vážná",
+        symptoms: ["Halucinace", "Třes", "Zmatek", "Pocení", "Křeče"],
+        causes: ["Náhlé vysazení alkoholu po dlouhodobém užívání"],
+        treatment: ["Hospitalizace", "Sedativa", "Podpora životních funkcí"],
+        prevention: ["Postupné vysazování alkoholu", "Léčba závislosti"],
+        description: "Delirium tremens je život ohrožující stav vznikající při náhlém vysazení alkoholu u závislých osob."
+    },
+    {
+        name: "Demence",
+        category: "Neurologické",
+        severity: "Střední až vážná",
+        symptoms: ["Ztráta paměti", "Zmatenost", "Poruchy řeči", "Změny osobnosti"],
+        causes: ["Degenerace mozkových buněk", "Alzheimerova choroba", "Cévní onemocnění"],
+        treatment: ["Léky zpomalující průběh", "Kognitivní trénink", "Podpora rodiny"],
+        prevention: ["Zdravý životní styl", "Mentální aktivita", "Kontrola krevního tlaku"],
+        description: "Demence je souhrnné označení pro poruchy paměti a dalších kognitivních funkcí, nejčastěji u starších osob."
+    },
+    {
+        name: "Deprese",
+        category: "Psychiatrické",
+        severity: "Střední až vážná",
+        symptoms: ["Smutek", "Ztráta zájmu", "Únava", "Poruchy spánku", "Myšlenky na sebevraždu"],
+        causes: ["Genetické predispozice", "Stres", "Hormonální změny", "Chronická onemocnění"],
+        treatment: ["Antidepresiva", "Psychoterapie", "Podpora okolí"],
+        prevention: ["Zdravý životní styl", "Řešení stresu", "Včasná intervence"],
+        description: "Duševní onemocnění charakterizované dlouhodobým pocitem smutku a ztrátou zájmu o běžné aktivity."
+    },
+    {
+        name: "Dermatomykózy",
+        category: "Kožní",
+        severity: "Mírná až střední",
+        symptoms: ["Svědění", "Zarudnutí", "Šupinatění kůže", "Puchýřky"],
+        causes: ["Plísňové infekce (dermatofyty, kvasinky)"],
+        treatment: ["Antimykotika (masti, tablety)", "Hygiena"],
+        prevention: ["Suchá a čistá kůže", "Nenošení cizí obuvi"],
+        description: "Dermatomykózy jsou plísňová onemocnění kůže, často postihují nohy, třísla a nehty."
+    },
+    {
+        name: "Dětská mozková obrna",
+        category: "Neurologické",
+        severity: "Střední až vážná",
+        symptoms: ["Poruchy pohybu", "Svalová ztuhlost", "Poruchy řeči", "Mentální retardace"],
+        causes: ["Poškození mozku během těhotenství, porodu nebo v raném dětství"],
+        treatment: ["Fyzioterapie", "Ergoterapie", "Logopedie", "Léky na uvolnění svalů"],
+        prevention: ["Prenatální péče", "Prevence infekcí v těhotenství"],
+        description: "Dětská mozková obrna je trvalé postižení pohybového aparátu vzniklé v raném dětství."
+    },
+    {
+        name: "Diabetes",
+        category: "Metabolické",
+        severity: "Střední až vážná",
+        symptoms: ["Časté močení", "Žízeň", "Únava", "Ztráta hmotnosti", "Zhoršené hojení ran"],
+        causes: ["Nedostatek inzulínu", "Inzulínová rezistence", "Autoimunitní procesy (typ 1)", "Životní styl (typ 2)"],
+        treatment: ["Inzulín", "Perorální antidiabetika", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Kontrola hmotnosti", "Pravidelná fyzická aktivita"],
+        description: "Chronické onemocnění charakterizované zvýšenou hladinou glukózy v krvi způsobenou poruchou tvorby nebo účinku inzulínu."
+    },
+    {
+        name: "Diabetická neuropatie",
+        category: "Neurologické/Metabolické",
+        severity: "Střední",
+        symptoms: ["Brnění a necitlivost končetin", "Bolest", "Svalová slabost", "Poruchy chůze"],
+        causes: ["Dlouhodobě vysoká hladina cukru v krvi (diabetes)"],
+        treatment: ["Kontrola cukrovky", "Léky proti bolesti", "Fyzioterapie"],
+        prevention: ["Důsledná léčba diabetu", "Pravidelné kontroly"],
+        description: "Poškození nervů způsobené dlouhodobě špatně kompenzovanou cukrovkou."
+    },
+    {
+        name: "Diabetická retinopatie",
+        category: "Oční/Metabolické",
+        severity: "Střední až vážná",
+        symptoms: ["Zhoršené vidění", "Skvrny před očima", "Slepota (v pokročilých stádiích)"],
+        causes: ["Poškození cév sítnice při dlouhodobé cukrovce"],
+        treatment: ["Kontrola cukrovky", "Laserová léčba", "Chirurgický zákrok"],
+        prevention: ["Pravidelné oční kontroly", "Důsledná léčba diabetu"],
+        description: "Diabetická retinopatie je poškození sítnice oka způsobené dlouhodobě vysokou hladinou cukru v krvi."
+    },
+    {
+        name: "Divertikulóza",
+        category: "Gastroenterologické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest břicha", "Zácpa", "Nadýmání", "Krev ve stolici"],
+        causes: ["Výchlipky ve stěně tlustého střeva", "Nedostatek vlákniny ve stravě"],
+        treatment: ["Dieta s vysokým obsahem vlákniny", "Léky proti bolesti", "Chirurgická léčba (v komplikovaných případech)"],
+        prevention: ["Dostatek vlákniny", "Pravidelný pohyb"],
+        description: "Divertikulóza je stav, kdy se ve stěně tlustého střeva tvoří výchlipky (divertikly), které mohou způsobit zánět."
+    },
+    {
+        name: "Dna",
+        category: "Metabolické",
+        severity: "Střední",
+        symptoms: ["Bolest a otok kloubů", "Zarudnutí", "Zvýšená teplota kloubu"],
+        causes: ["Hromadění kyseliny močové v těle", "Porucha metabolismu purinů"],
+        treatment: ["Léky snižující hladinu kyseliny močové", "Dieta", "Analgetika"],
+        prevention: ["Omezení alkoholu", "Dieta s nízkým obsahem purinů"],
+        description: "Dna je metabolické onemocnění způsobené ukládáním krystalů kyseliny močové v kloubech."
+                         },
+    {
+        name: "Downův syndrom",
+        category: "Genetické",
+        severity: "Střední",
+        symptoms: ["Mentální retardace", "Typický vzhled obličeje", "Hypotonie", "Srdeční vady"],
+        causes: ["Trizomie 21. chromozomu (genetická vada)"],
+        treatment: ["Podpůrná péče", "Speciální vzdělávání", "Léčba přidružených onemocnění"],
+        prevention: ["Prenatální diagnostika", "Genetické poradenství"],
+        description: "Downův syndrom je genetická porucha způsobená přítomností třetí kopie 21. chromozomu."
+    },
+    {
+        name: "Dráždivý tračník",
+        category: "Gastroenterologické",
+        severity: "Mírná až střední",
+        symptoms: ["Bolest břicha", "Průjem nebo zácpa", "Nadýmání", "Pocit neúplného vyprázdnění"],
+        causes: ["Stres", "Nesprávná strava", "Poruchy střevní motility"],
+        treatment: ["Dieta", "Psychoterapie", "Léky na úpravu stolice"],
+        prevention: ["Zdravý životní styl", "Dostatek vlákniny", "Řešení stresu"],
+        description: "Dráždivý tračník je funkční porucha střev projevující se bolestí břicha a změnami stolice."
+    },
+    {
+        name: "Duhringova choroba",
+        category: "Autoimunitní/Kožní",
+        severity: "Střední",
+        symptoms: ["Svědivé puchýře na kůži", "Vyrážka", "Pálení kůže"],
+        causes: ["Autoimunitní reakce na lepek (gluten)"],
+        treatment: ["Bezlepková dieta", "Kortikoidní masti"],
+        prevention: ["Vyhýbání se lepku ve stravě"],
+        description: "Duhringova choroba je autoimunitní kožní onemocnění spojené s nesnášenlivostí lepku."
+    },
+    {
+        name: "Dušnost",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Pocit nedostatku vzduchu", "Zrychlené dýchání", "Únava", "Bolest na hrudi"],
+        causes: ["Astma", "CHOPN", "Srdeční selhání", "Plicní embolie"],
+        treatment: ["Léčba základní příčiny", "Podávání kyslíku", "Inhalace"],
+        prevention: ["Prevence respiračních a srdečních onemocnění", "Zdravý životní styl"],
+        description: "Dušnost je subjektivní pocit nedostatku vzduchu, může být příznakem mnoha onemocnění."
+    },
+    {
+        name: "EB viróza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Únava", "Zvětšené uzliny", "Bolest v krku", "Zvětšená slezina"],
+        causes: ["Epstein-Barrové virus (EBV)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Symptomatická léčba"],
+        prevention: ["Hygiena", "Vyhýbat se kontaktu s nemocnými"],
+        description: "EB viróza (infekční mononukleóza) je virové onemocnění způsobené virem EBV, projevuje se únavou, horečkou a zvětšenými uzlinami."
+    },
+    {
+        name: "Ebola",
+        category: "Infekční",
+        severity: "Velmi vážná",
+        symptoms: ["Vysoká horečka", "Krvácení", "Zvracení", "Průjem", "Bolest svalů"],
+        causes: ["Ebolavirus", "Kontakt s tělními tekutinami infikovaných osob nebo zvířat"],
+        treatment: ["Podpůrná léčba", "Rehydratace", "Izolace pacienta"],
+        prevention: ["Ochranné pomůcky", "Izolace nemocných", "Prevence kontaktu s nakaženými zvířaty"],
+        description: "Ebola je vysoce nakažlivé virové onemocnění s vysokou úmrtností, přenáší se kontaktem s tělními tekutinami."
+    },
+    {
+        name: "Edém",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Otoky", "Napětí kůže", "Ztížený pohyb", "Zvýšená hmotnost"],
+        causes: ["Srdeční selhání", "Onemocnění ledvin", "Alergická reakce", "Poranění"],
+        treatment: ["Léčba základní příčiny", "Diuretika", "Omezení soli"],
+        prevention: ["Léčba chronických onemocnění", "Zdravý životní styl"],
+        description: "Edém je otok tkání způsobený hromaděním tekutiny, často v důsledku srdečních, ledvinných nebo jaterních onemocnění."
+    },
+    {
+        name: "Ekzém",
+        category: "Kožní",
+        severity: "Mírná až střední",
+        symptoms: ["Svědění", "Zarudnutí", "Suchá kůže", "Puchýřky", "Šupinatění"],
+        causes: ["Alergie", "Dráždivé látky", "Genetická predispozice", "Stres"],
+        treatment: ["Kortikoidní masti", "Emoliencia", "Vyhýbání se spouštěčům"],
+        prevention: ["Hydratace kůže", "Vyhýbání se alergenům", "Zdravý životní styl"],
+        description: "Ekzém je zánětlivé onemocnění kůže, často alergického původu, projevuje se svěděním a zarudnutím."
+    },
+    {
+        name: "Endometrióza",
+        category: "Gynekologické",
+        severity: "Střední",
+        symptoms: ["Bolestivá menstruace", "Bolest při pohlavním styku", "Neplodnost", "Bolest v podbřišku"],
+        causes: ["Růst děložní sliznice mimo dělohu", "Hormonální faktory"],
+        treatment: ["Hormonální léčba", "Chirurgické odstranění ložisek", "Analgetika"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Endometrióza je onemocnění, při kterém se tkáň podobná děložní sliznici nachází mimo dělohu, způsobuje bolest a může vést k neplodnosti."
+    },
+    {
+        name: "Epilepsie",
+        category: "Neurologické",
+        severity: "Střední až vážná",
+        symptoms: ["Křeče", "Ztráta vědomí", "Záškuby svalů", "Zmatek po záchvatu"],
+        causes: ["Genetické predispozice", "Poranění mozku", "Nádory", "Infekce"],
+        treatment: ["Antiepileptika", "Chirurgická léčba (v některých případech)", "Vyhýbání se spouštěčům"],
+        prevention: ["Prevence úrazů hlavy", "Léčba infekcí", "Dodržování léčby"],
+        description: "Onemocnění charakterizované opakovanými epileptickými záchvaty způsobenými abnormální elektrickou aktivitou v mozku."
+    },
+    {
+        name: "Escherichia coli",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Průjem", "Bolest břicha", "Horečka", "Nevolnost"],
+        causes: ["Bakterie Escherichia coli", "Kontaminovaná voda nebo potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)", "Dieta"],
+        prevention: ["Hygiena", "Bezpečná voda a potraviny"],
+        description: "Bakteriální infekce způsobující průjmová onemocnění, často z kontaminované vody nebo potravin."
+    },
+    {
+        name: "Fallotova tetralogie",
+        category: "Kardiovaskulární/Genetické",
+        severity: "Vážná",
+        symptoms: ["Modré zbarvení kůže (cyanóza)", "Dušnost", "Únava", "Zpomalený růst"],
+        causes: ["Vrozená srdeční vada (kombinace čtyř defektů)"],
+        treatment: ["Chirurgická korekce", "Podpůrná léčba"],
+        prevention: ["Prenatální péče", "Genetické poradenství"],
+        description: "Vrozená srdeční vada tvořená čtyřmi defekty, způsobuje nedostatečné okysličení krve."
+    },
+    {
+        name: "Fenylketonurie",
+        category: "Genetické/Metabolické",
+        severity: "Střední",
+        symptoms: ["Mentální retardace", "Záchvaty", "Ekzém", "Zápach moči"],
+        causes: ["Genetická porucha metabolismu fenylalaninu"],
+        treatment: ["Dieta s nízkým obsahem fenylalaninu", "Pravidelné kontroly"],
+        prevention: ["Novorozenecký screening", "Dodržování diety"],
+        description: "Vzácné dědičné onemocnění metabolismu aminokyselin, vyžaduje celoživotní dietu."
+    },
+    {
+        name: "Fibrilace komor",
+        category: "Kardiovaskulární",
+        severity: "Velmi vážná",
+        symptoms: ["Ztráta vědomí", "Zástava oběhu", "Nedýchání"],
+        causes: ["Infarkt myokardu", "Poruchy srdečního rytmu", "Elektrický šok"],
+        treatment: ["Okamžitá defibrilace", "Kardiopulmonální resuscitace (KPR)"],
+        prevention: ["Léčba srdečních onemocnění", "Prevence infarktu"],
+        description: "Život ohrožující porucha srdečního rytmu, která vede k zástavě oběhu."
+    },
+    {
+        name: "Fibrilace síní",
+        category: "Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Nepravidelný srdeční tep", "Bušení srdce", "Slabost", "Dušnost"],
+        causes: ["Vysoký krevní tlak", "Srdeční onemocnění", "Stárnutí"],
+        treatment: ["Antiarytmika", "Antikoagulancia", "Kardioversní léčba"],
+        prevention: ["Léčba hypertenze", "Zdravý životní styl"],
+        description: "Nejčastější porucha srdečního rytmu, zvyšuje riziko cévní mozkové příhody."
+    },
+    {
+        name: "Fibrom",
+        category: "Nádorové/Kožní",
+        severity: "Mírná",
+        symptoms: ["Malý nezhoubný útvar na kůži nebo sliznici", "Obvykle bezbolestný"],
+        causes: ["Neznámé", "Genetická predispozice"],
+        treatment: ["Chirurgické odstranění", "Pozorování"],
+        prevention: ["Nelze předcházet"],
+        description: "Fibrom je nezhoubný nádor z vazivové tkáně, často se vyskytuje na kůži."
+    },
+    {
+        name: "Fobie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Intenzivní strach z určitého objektu nebo situace", "Úzkost", "Vyhýbavé chování"],
+        causes: ["Psychologické faktory", "Negativní zkušenost", "Genetická predispozice"],
+        treatment: ["Kognitivně-behaviorální terapie", "Expozice", "Medikace (v těžších případech)"],
+        prevention: ["Včasná psychologická intervence"],
+        description: "Fobie je iracionální a přehnaný strach z konkrétního objektu nebo situace."
+    },
+    {
+        name: "Folikulitida (zánět vlasových váčků)",
+        category: "Kožní/Infekční",
+        severity: "Mírná",
+        symptoms: ["Červené pupínky", "Svědění", "Bolest", "Hnisavé puchýřky"],
+        causes: ["Bakteriální infekce (stafylokoky)", "Poranění kůže", "Holící návyky"],
+        treatment: ["Antibiotické masti", "Dezinfekce", "Vyhýbání se dráždění"],
+        prevention: ["Hygiena", "Opatrné holení", "Vyhýbání se sdílení ručníků"],
+        description: "Zánět vlasových váčků způsobený nejčastěji bakteriemi, projevuje se pupínky a svěděním."
+    },
+    {
+        name: "Frotérství",
+        category: "Psychiatrické",
+        severity: "Mírná",
+        symptoms: ["Nutkání dotýkat se cizích osob na veřejnosti", "Sexuální uspokojení z dotyku"],
+        causes: ["Psychologické faktory", "Poruchy osobnosti"],
+        treatment: ["Psychoterapie", "Léky (v některých případech)"],
+        prevention: ["Včasná psychologická intervence"],
+        description: "Frotérství je sexuální deviace spočívající v nutkání dotýkat se cizích osob na veřejnosti."
+    },
+    {
+        name: "Furunkl",
+        category: "Kožní/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Bolestivý hnisavý uzlík", "Zarudnutí", "Otok", "Horečka (u těžších případů)"],
+        causes: ["Bakteriální infekce (stafylokoky)", "Poranění kůže"],
+        treatment: ["Teplé obklady", "Antibiotika", "Chirurgické otevření (u větších furunklů)"],
+        prevention: ["Hygiena", "Ošetření drobných poranění"],
+        description: "Furunkl je hnisavý zánět vlasového folikulu a okolní tkáně, často na krku, obličeji nebo hýždích."
+    },
+    {
+        name: "Gangréna",
+        category: "Chirurgické/Infekční",
+        severity: "Velmi vážná",
+        symptoms: ["Černání tkáně", "Zápach", "Bolest", "Otok", "Horečka"],
+        causes: ["Nedokrvení tkáně", "Infekce (Clostridium perfringens)", "Poranění"],
+        treatment: ["Chirurgické odstranění odumřelé tkáně", "Antibiotika", "Amputace (v těžkých případech)"],
+        prevention: ["Léčba poranění", "Prevence infekcí", "Kontrola diabetu"],
+        description: "Gangréna je odumření tkáně v důsledku nedokrvení nebo infekce, vyžaduje rychlou léčbu."
+    },
+    {
+        name: "Genitální bradavice",
+        category: "Kožní/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výrůstky v oblasti genitálií", "Svědění", "Bolest"],
+        causes: ["Infekce lidským papilomavirem (HPV)"],
+        treatment: ["Kryoterapie", "Masti", "Chirurgické odstranění"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "Genitální bradavice jsou nezhoubné výrůstky v oblasti genitálií způsobené infekcí HPV."
+    },
+    {
+        name: "Genitální opar",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Puchýřky v oblasti genitálií", "Svědění", "Pálení", "Bolest při močení"],
+        causes: ["Infekce virem herpes simplex (HSV-2)"],
+        treatment: ["Antivirotika", "Lokální léčba", "Analgetika"],
+        prevention: ["Bezpečný sex", "Vyhýbání se kontaktu s nakaženými osobami"],
+        description: "Genitální opar je virové onemocnění projevující se puchýřky a bolestí v oblasti genitálií."
+    },
+    {
+        name: "Glomerulonefritida",
+        category: "Ledviny/Imunitní",
+        severity: "Střední až vážná",
+        symptoms: ["Otoky", "Krev v moči", "Vysoký krevní tlak", "Únava"],
+        causes: ["Autoimunitní reakce", "Infekce", "Genetické faktory"],
+        treatment: ["Imunosupresiva", "Léčba infekce", "Dialýza (v těžkých případech)"],
+        prevention: ["Léčba infekcí", "Kontrola krevního tlaku"],
+        description: "Glomerulonefritida je zánět ledvinných klubíček, může vést k selhání ledvin."
+    },
+    {
+        name: "Graves-Basedowova nemoc",
+        category: "Endokrinní/Autoimunitní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Vypouklé oči", "Nervozita"],
+        causes: ["Autoimunitní reakce proti štítné žláze"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Autoimunitní onemocnění štítné žlázy vedoucí k její nadměrné činnosti."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+    {
+        name: "Hepatorenální syndrom",
+        category: "Jaterní/Ledvinné",
+        severity: "Vážná",
+        symptoms: ["Otoky", "Nízký výdej moči", "Únava", "Zhoršení jaterních funkcí"],
+        causes: ["Pokročilá jaterní cirhóza", "Selhání jater"],
+        treatment: ["Podpůrná léčba", "Transplantace jater"],
+        prevention: ["Prevence jaterních onemocnění", "Včasná léčba cirhózy"],
+        description: "Hepatorenální syndrom je selhání ledvin u pacientů s těžkým jaterním onemocněním."
+    },
+    {
+        name: "Histoplazmóza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Horečka", "Únava", "Bolest na hrudi"],
+        causes: ["Plísňová infekce (Histoplasma capsulatum)", "Vdechnutí spór z půdy"],
+        treatment: ["Antimykotika", "Podpůrná léčba"],
+        prevention: ["Vyhýbat se prašnému prostředí", "Ochranné pomůcky při práci se zeminou"],
+        description: "Histoplazmóza je plísňové onemocnění plic, častější v některých geografických oblastech."
+    },
+    {
+        name: "Hodgkinův lymfom",
+        category: "Onkologické",
+        severity: "Vážná",
+        symptoms: ["Zvětšené uzliny", "Noční pocení", "Horečka", "Úbytek hmotnosti"],
+        causes: ["Neznámé", "Genetické a virové faktory (EBV)"],
+        treatment: ["Chemoterapie", "Radioterapie", "Transplantace kostní dřeně"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Zhoubné nádorové onemocnění lymfatického systému, často s dobrými výsledky léčby."
+    },
+    {
+        name: "Horečka",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Zvýšená tělesná teplota", "Únava", "Pocení", "Bolest hlavy"],
+        causes: ["Infekce", "Zánět", "Imunitní reakce"],
+        treatment: ["Antipyretika", "Dostatek tekutin", "Léčba příčiny"],
+        prevention: ["Prevence infekcí", "Hygiena"],
+        description: "Horečka je zvýšená tělesná teplota jako reakce organismu na infekci nebo zánět."
+    },
+    {
+        name: "Horečka dengue",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Vysoká horečka", "Bolest svalů a kloubů", "Vyrážka", "Bolest hlavy"],
+        causes: ["Virus dengue", "Přenos komárem Aedes"],
+        treatment: ["Podpůrná léčba", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Ochrana proti komárům", "Prevence bodnutí"],
+        description: "Virové onemocnění přenášené komáry, časté v tropech."
+    },
+    {
+        name: "Horečka omladnic",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka po porodu", "Bolest břicha", "Zápach z rodidel", "Slabost"],
+        causes: ["Bakteriální infekce dělohy po porodu"],
+        treatment: ["Antibiotika", "Podpůrná léčba"],
+        prevention: ["Sterilita při porodu", "Včasná léčba infekcí"],
+        description: "Závažná infekce dělohy po porodu, dříve častá příčina úmrtí žen."
+    },
+    {
+        name: "Huntingtonova choroba",
+        category: "Neurologické/Genetické",
+        severity: "Vážná",
+        symptoms: ["Poruchy pohybu", "Změny chování", "Demence", "Poruchy řeči"],
+        causes: ["Genetická mutace (dědičné)"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče", "Psychologická pomoc"],
+        prevention: ["Genetické poradenství"],
+        description: "Vzácné dědičné neurodegenerativní onemocnění s progresivními pohybovými a psychickými poruchami."
+    },
+    {
+        name: "Hydrokéla",
+        category: "Urologické",
+        severity: "Mírná",
+        symptoms: ["Otok šourku", "Pocit tíhy", "Někdy bolest"],
+        causes: ["Nahromadění tekutiny v obalech varlete", "Poranění", "Infekce"],
+        treatment: ["Chirurgické odstranění tekutiny", "Pozorování (u dětí často vymizí)"],
+        prevention: ["Prevence poranění", "Léčba infekcí"],
+        description: "Hydrokéla je nahromadění tekutiny v obalech varlete, častější u dětí."
+    },
+    {
+        name: "Hyperaktivní močový měchýř",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Náhlé úniky moči"],
+        causes: ["Porucha nervového řízení močového měchýře", "Stárnutí", "Infekce"],
+        treatment: ["Rehabilitace pánevního dna", "Léky", "Změna životního stylu"],
+        prevention: ["Pravidelné močení", "Prevence infekcí"],
+        description: "Hyperaktivní močový měchýř je stav s častým nutkáním na močení a úniky moči."
+    },
+    {
+        name: "Hyperandrogenismus",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Nadměrné ochlupení", "Akné", "Poruchy menstruace", "Hlubší hlas"],
+        causes: ["Zvýšená produkce mužských hormonů", "Syndrom polycystických ovarií", "Nádory"],
+        treatment: ["Hormonální léčba", "Léky na snížení androgenů"],
+        prevention: ["Včasná diagnostika", "Zdravý životní styl"],
+        description: "Hyperandrogenismus je stav s nadbytkem mužských hormonů u žen."
+    },
+    {
+        name: "Hypertenze",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Často bez příznaků", "Bolest hlavy", "Závratě", "Únava"],
+        causes: ["Genetické faktory", "Nadváha", "Stres", "Nadměrný příjem soli"],
+        treatment: ["Léky na snížení tlaku", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Omezení soli", "Pravidelné kontroly"],
+        description: "Hypertenze je dlouhodobě zvýšený krevní tlak, zvyšuje riziko infarktu a mrtvice."
+    },
+    {
+        name: "Hypertyreóza (zvýšená funkce štítné žlázy)",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Nervozita", "Nespavost"],
+        causes: ["Graves-Basedowova nemoc", "Nodulární struma", "Nadměrný příjem hormonů"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Včasná diagnostika", "Kontrola hormonálních hladin"],
+        description: "Onemocnění štítné žlázy charakterizované nadměrnou produkcí hormonů."
+    },
+    {
+        name: "Hypochondrie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Přehnané obavy o zdraví", "Vyhledávání lékařské péče", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí"],
+        treatment: ["Psychoterapie", "Podpůrná léčba", "Někdy antidepresiva"],
+        prevention: ["Zdravý životní styl", "Podpora okolí"],
+        description: "Hypochondrie je psychická porucha s přehnanými obavami z vážné nemoci."
+    },
+    {
+        name: "Hypotenze",
+        category: "Kardiovaskulární",
+        severity: "Mírná",
+        symptoms: ["Závratě", "Slabost", "Mdloby", "Únava"],
+        causes: ["Dehydratace", "Krvácení", "Srdeční onemocnění", "Léky"],
+        treatment: ["Dostatek tekutin", "Zvýšení příjmu soli", "Léčba příčiny"],
+        prevention: ["Dostatek tekutin", "Opatrné vstávání"],
+        description: "Hypotenze je nízký krevní tlak, často způsobuje závratě a slabost."
+    },
+    {
+        name: "Hypotyreóza",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Přibývání na váze", "Suchá kůže", "Zácpa", "Zpomalení myšlení"],
+        causes: ["Autoimunitní zánět (Hashimotova tyreoiditida)", "Nedostatek jódu", "Poškození štítné žlázy"],
+        treatment: ["Substituce hormonů", "Dieta s dostatkem jódu"],
+        prevention: ["Dostatek jódu ve stravě", "Včasná diagnostika"],
+        description: "Onemocnění štítné žlázy způsobené nedostatečnou produkcí hormonů."
+    },
+    {
+        name: "Hypoxie",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Modrání rtů", "Závratě", "Ztráta vědomí"],
+        causes: ["Nedostatek kyslíku v krvi", "Plicní onemocnění", "Srdeční selhání"],
+        treatment: ["Podávání kyslíku", "Léčba základní příčiny"],
+        prevention: ["Prevence respiračních a srdečních onemocnění"],
+        description: "Hypoxie je nedostatek kyslíku v těle, může být život ohrožující."
+    },
+    {
+        name: "Charcotova osteoartropatie",
+        category: "Ortopedické/Diabetické",
+        severity: "Střední až vážná",
+        symptoms: ["Deformity nohy", "Otok", "Zarudnutí", "Bolest (často chybí)"],
+        causes: ["Diabetes mellitus", "Neuropatie"],
+        treatment: ["Odlehčení končetiny", "Ortopedická obuv", "Chirurgická léčba"],
+        prevention: ["Kontrola diabetu", "Pravidelné kontroly nohou"],
+        description: "Charcotova osteoartropatie je destrukce kostí a kloubů nohy u diabetiků s neuropatií."
+    },
+    {
+        name: "Chlamydie",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Pálení při močení", "Bolest v podbřišku", "Někdy bez příznaků"],
+        causes: ["Bakterie Chlamydia trachomatis", "Pohlavní styk"],
+        treatment: ["Antibiotika"],
+        prevention: ["Bezpečný sex", "Pravidelné testování"],
+        description: "Chlamydiová infekce je nejčastější pohlavně přenosná bakteriální infekce."
+    },
+    {
+        name: "Cholera",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vodnatý průjem", "Zvracení", "Dehydratace", "Křeče"],
+        causes: ["Bakterie Vibrio cholerae", "Kontaminovaná voda a potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)"],
+        prevention: ["Bezpečná voda", "Hygiena", "Očkování"],
+        description: "Cholera je akutní střevní infekce způsobující těžkou dehydrataci."
+    },
+    {
+        name: "Chrápání",
+        category: "Respirační",
+        severity: "Mírná až střední",
+        symptoms: ["Zvuk při dýchání ve spánku", "Narušení spánku", "Únava"],
+        causes: ["Uvolnění svalů hrdla", "Nadváha", "Alkohol", "Anatomické faktory"],
+        treatment: ["Změna polohy při spánku", "Redukce hmotnosti", "Léčba spánkové apnoe"],
+        prevention: ["Zdravý životní styl", "Omezení alkoholu"],
+        description: "Chrápání je zvuk vznikající při dýchání ve spánku, často neškodné, ale může být příznakem spánkové apnoe."
+    },
+    {
+        name: "Chronická bolest",
+        category: "Symptomatické",
+        severity: "Střední až vážná",
+        symptoms: ["Dlouhodobá bolest", "Únava", "Poruchy spánku", "Deprese"],
+        causes: ["Chronická onemocnění", "Poranění", "Neuropatie"],
+        treatment: ["Analgetika", "Fyzioterapie", "Psychoterapie"],
+        prevention: ["Včasná léčba akutní bolesti", "Zdravý životní styl"],
+        description: "Chronická bolest je bolest trvající déle než 3 měsíce, často vyžaduje komplexní léčbu."
+    },
+    {
+        name: "Chronická obstrukční plicní nemoc (CHOPN)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Kašel", "Vykašlávání hlenu", "Únava"],
+        causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory"],
+        treatment: ["Inhalátory", "Odvykání kouření", "Rehabilitace", "Kyslíková terapie"],
+        prevention: ["Nekouřit", "Vyhýbat se znečištěnému ovzduší"],
+        description: "CHOPN je chronické onemocnění plic způsobující zúžení dýchacích cest."
+    },
+    {
+        name: "Chronická rýma",
+        category: "Respirační",
+        severity: "Mírná",
+        symptoms: ["Dlouhodobá rýma", "Ucpaný nos", "Svědění", "Kýchání"],
+        causes: ["Alergie", "Infekce", "Dráždivé látky"],
+        treatment: ["Nosní spreje", "Antihistaminika", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Hygiena"],
+        description: "Chronická rýma je dlouhodobý zánět nosní sliznice, často alergického původu."
+    },
+    {
+        name: "Chronický únavový syndrom",
+        category: "Neurologické/Imunitní",
+        severity: "Střední",
+        symptoms: ["Dlouhodobá únava", "Poruchy spánku", "Bolesti svalů", "Poruchy koncentrace"],
+        causes: ["Nejasné (pravděpodobně virové, imunitní, psychologické)"],
+        treatment: ["Podpůrná léčba", "Psychoterapie", "Rehabilitace"],
+        prevention: ["Zdravý životní styl", "Řešení stresu"],
+        description: "Chronický únavový syndrom je stav s dlouhodobou únavou bez jasné příčiny."
+    },
+    {
+        name: "Chřipka",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Kašel", "Bolest svalů", "Rýma", "Únava"],
+        causes: ["Virus chřipky (influenza)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Očkování", "Hygiena", "Vyhýbat se nemocným"],
+        description: "Chřipka je akutní virové onemocnění dýchacích cest, často s horečkou a bolestí svalů."
+    },
+    {
+        name: "Chudokrevnost (anémie)",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění"],
+        treatment: ["Doplňky železa", "Léčba příčiny", "Transfúze"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Chudokrevnost je stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+    {
+        name: "Hepatorenální syndrom",
+        category: "Jaterní/Ledvinné",
+        severity: "Vážná",
+        symptoms: ["Otoky", "Nízký výdej moči", "Únava", "Zhoršení jaterních funkcí"],
+        causes: ["Pokročilá jaterní cirhóza", "Selhání jater"],
+        treatment: ["Podpůrná léčba", "Transplantace jater"],
+        prevention: ["Prevence jaterních onemocnění", "Včasná léčba cirhózy"],
+        description: "Hepatorenální syndrom je selhání ledvin u pacientů s těžkým jaterním onemocněním."
+    },
+    {
+        name: "Histoplazmóza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Horečka", "Únava", "Bolest na hrudi"],
+        causes: ["Plísňová infekce (Histoplasma capsulatum)", "Vdechnutí spór z půdy"],
+        treatment: ["Antimykotika", "Podpůrná léčba"],
+        prevention: ["Vyhýbat se prašnému prostředí", "Ochranné pomůcky při práci se zeminou"],
+        description: "Histoplazmóza je plísňové onemocnění plic, častější v některých geografických oblastech."
+    },
+    {
+        name: "Hodgkinův lymfom",
+        category: "Onkologické",
+        severity: "Vážná",
+        symptoms: ["Zvětšené uzliny", "Noční pocení", "Horečka", "Úbytek hmotnosti"],
+        causes: ["Neznámé", "Genetické a virové faktory (EBV)"],
+        treatment: ["Chemoterapie", "Radioterapie", "Transplantace kostní dřeně"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Zhoubné nádorové onemocnění lymfatického systému, často s dobrými výsledky léčby."
+    },
+    {
+        name: "Horečka",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Zvýšená tělesná teplota", "Únava", "Pocení", "Bolest hlavy"],
+        causes: ["Infekce", "Zánět", "Imunitní reakce"],
+        treatment: ["Antipyretika", "Dostatek tekutin", "Léčba příčiny"],
+        prevention: ["Prevence infekcí", "Hygiena"],
+        description: "Horečka je zvýšená tělesná teplota jako reakce organismu na infekci nebo zánět."
+    },
+    {
+        name: "Horečka dengue",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Vysoká horečka", "Bolest svalů a kloubů", "Vyrážka", "Bolest hlavy"],
+        causes: ["Virus dengue", "Přenos komárem Aedes"],
+        treatment: ["Podpůrná léčba", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Ochrana proti komárům", "Prevence bodnutí"],
+        description: "Virové onemocnění přenášené komáry, časté v tropech."
+    },
+    {
+        name: "Horečka omladnic",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka po porodu", "Bolest břicha", "Zápach z rodidel", "Slabost"],
+        causes: ["Bakteriální infekce dělohy po porodu"],
+        treatment: ["Antibiotika", "Podpůrná léčba"],
+        prevention: ["Sterilita při porodu", "Včasná léčba infekcí"],
+        description: "Závažná infekce dělohy po porodu, dříve častá příčina úmrtí žen."
+    },
+    {
+        name: "Huntingtonova choroba",
+        category: "Neurologické/Genetické",
+        severity: "Vážná",
+        symptoms: ["Poruchy pohybu", "Změny chování", "Demence", "Poruchy řeči"],
+        causes: ["Genetická mutace (dědičné)"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče", "Psychologická pomoc"],
+        prevention: ["Genetické poradenství"],
+        description: "Vzácné dědičné neurodegenerativní onemocnění s progresivními pohybovými a psychickými poruchami."
+    },
+    {
+        name: "Hydrokéla",
+        category: "Urologické",
+        severity: "Mírná",
+        symptoms: ["Otok šourku", "Pocit tíhy", "Někdy bolest"],
+        causes: ["Nahromadění tekutiny v obalech varlete", "Poranění", "Infekce"],
+        treatment: ["Chirurgické odstranění tekutiny", "Pozorování (u dětí často vymizí)"],
+        prevention: ["Prevence poranění", "Léčba infekcí"],
+        description: "Hydrokéla je nahromadění tekutiny v obalech varlete, častější u dětí."
+    },
+    {
+        name: "Hyperaktivní močový měchýř",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Náhlé úniky moči"],
+        causes: ["Porucha nervového řízení močového měchýře", "Stárnutí", "Infekce"],
+        treatment: ["Rehabilitace pánevního dna", "Léky", "Změna životního stylu"],
+        prevention: ["Pravidelné močení", "Prevence infekcí"],
+        description: "Hyperaktivní močový měchýř je stav s častým nutkáním na močení a úniky moči."
+    },
+    {
+        name: "Hyperandrogenismus",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Nadměrné ochlupení", "Akné", "Poruchy menstruace", "Hlubší hlas"],
+        causes: ["Zvýšená produkce mužských hormonů", "Syndrom polycystických ovarií", "Nádory"],
+        treatment: ["Hormonální léčba", "Léky na snížení androgenů"],
+        prevention: ["Včasná diagnostika", "Zdravý životní styl"],
+        description: "Hyperandrogenismus je stav s nadbytkem mužských hormonů u žen."
+    },
+    {
+        name: "Hypertenze",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Často bez příznaků", "Bolest hlavy", "Závratě", "Únava"],
+        causes: ["Genetické faktory", "Nadváha", "Stres", "Nadměrný příjem soli"],
+        treatment: ["Léky na snížení tlaku", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Omezení soli", "Pravidelné kontroly"],
+        description: "Hypertenze je dlouhodobě zvýšený krevní tlak, zvyšuje riziko infarktu a mrtvice."
+    },
+    {
+        name: "Hypertyreóza (zvýšená funkce štítné žlázy)",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Nervozita", "Nespavost"],
+        causes: ["Graves-Basedowova nemoc", "Nodulární struma", "Nadměrný příjem hormonů"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Včasná diagnostika", "Kontrola hormonálních hladin"],
+        description: "Onemocnění štítné žlázy charakterizované nadměrnou produkcí hormonů."
+    },
+    {
+        name: "Hypochondrie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Přehnané obavy o zdraví", "Vyhledávání lékařské péče", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí"],
+        treatment: ["Psychoterapie", "Podpůrná léčba", "Někdy antidepresiva"],
+        prevention: ["Zdravý životní styl", "Podpora okolí"],
+        description: "Hypochondrie je psychická porucha s přehnanými obavami z vážné nemoci."
+    },
+    {
+        name: "Hypotenze",
+        category: "Kardiovaskulární",
+        severity: "Mírná",
+        symptoms: ["Závratě", "Slabost", "Mdloby", "Únava"],
+        causes: ["Dehydratace", "Krvácení", "Srdeční onemocnění", "Léky"],
+        treatment: ["Dostatek tekutin", "Zvýšení příjmu soli", "Léčba příčiny"],
+        prevention: ["Dostatek tekutin", "Opatrné vstávání"],
+        description: "Hypotenze je nízký krevní tlak, často způsobuje závratě a slabost."
+    },
+    {
+        name: "Hypotyreóza",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Přibývání na váze", "Suchá kůže", "Zácpa", "Zpomalení myšlení"],
+        causes: ["Autoimunitní zánět (Hashimotova tyreoiditida)", "Nedostatek jódu", "Poškození štítné žlázy"],
+        treatment: ["Substituce hormonů", "Dieta s dostatkem jódu"],
+        prevention: ["Dostatek jódu ve stravě", "Včasná diagnostika"],
+        description: "Onemocnění štítné žlázy způsobené nedostatečnou produkcí hormonů."
+    },
+    {
+        name: "Hypoxie",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Modrání rtů", "Závratě", "Ztráta vědomí"],
+        causes: ["Nedostatek kyslíku v krvi", "Plicní onemocnění", "Srdeční selhání"],
+        treatment: ["Podávání kyslíku", "Léčba základní příčiny"],
+        prevention: ["Prevence respiračních a srdečních onemocnění"],
+        description: "Hypoxie je nedostatek kyslíku v těle, může být život ohrožující."
+    },
+    {
+        name: "Charcotova osteoartropatie",
+        category: "Ortopedické/Diabetické",
+        severity: "Střední až vážná",
+        symptoms: ["Deformity nohy", "Otok", "Zarudnutí", "Bolest (často chybí)"],
+        causes: ["Diabetes mellitus", "Neuropatie"],
+        treatment: ["Odlehčení končetiny", "Ortopedická obuv", "Chirurgická léčba"],
+        prevention: ["Kontrola diabetu", "Pravidelné kontroly nohou"],
+        description: "Charcotova osteoartropatie je destrukce kostí a kloubů nohy u diabetiků s neuropatií."
+    },
+    {
+        name: "Chlamydie",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Pálení při močení", "Bolest v podbřišku", "Někdy bez příznaků"],
+        causes: ["Bakterie Chlamydia trachomatis", "Pohlavní styk"],
+        treatment: ["Antibiotika"],
+        prevention: ["Bezpečný sex", "Pravidelné testování"],
+        description: "Chlamydiová infekce je nejčastější pohlavně přenosná bakteriální infekce."
+    },
+    {
+        name: "Cholera",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vodnatý průjem", "Zvracení", "Dehydratace", "Křeče"],
+        causes: ["Bakterie Vibrio cholerae", "Kontaminovaná voda a potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)"],
+        prevention: ["Bezpečná voda", "Hygiena", "Očkování"],
+        description: "Cholera je akutní střevní infekce způsobující těžkou dehydrataci."
+    },
+    {
+        name: "Chrápání",
+        category: "Respirační",
+        severity: "Mírná až střední",
+        symptoms: ["Zvuk při dýchání ve spánku", "Narušení spánku", "Únava"],
+        causes: ["Uvolnění svalů hrdla", "Nadváha", "Alkohol", "Anatomické faktory"],
+        treatment: ["Změna polohy při spánku", "Redukce hmotnosti", "Léčba spánkové apnoe"],
+        prevention: ["Zdravý životní styl", "Omezení alkoholu"],
+        description: "Chrápání je zvuk vznikající při dýchání ve spánku, často neškodné, ale může být příznakem spánkové apnoe."
+    },
+    {
+        name: "Chronická bolest",
+        category: "Symptomatické",
+        severity: "Střední až vážná",
+        symptoms: ["Dlouhodobá bolest", "Únava", "Poruchy spánku", "Deprese"],
+        causes: ["Chronická onemocnění", "Poranění", "Neuropatie"],
+        treatment: ["Analgetika", "Fyzioterapie", "Psychoterapie"],
+        prevention: ["Včasná léčba akutní bolesti", "Zdravý životní styl"],
+        description: "Chronická bolest je bolest trvající déle než 3 měsíce, často vyžaduje komplexní léčbu."
+    },
+    {
+        name: "Chronická obstrukční plicní nemoc (CHOPN)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Kašel", "Vykašlávání hlenu", "Únava"],
+        causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory"],
+        treatment: ["Inhalátory", "Odvykání kouření", "Rehabilitace", "Kyslíková terapie"],
+        prevention: ["Nekouřit", "Vyhýbat se znečištěnému ovzduší"],
+        description: "CHOPN je chronické onemocnění plic způsobující zúžení dýchacích cest."
+    },
+    {
+        name: "Chronická rýma",
+        category: "Respirační",
+        severity: "Mírná",
+        symptoms: ["Dlouhodobá rýma", "Ucpaný nos", "Svědění", "Kýchání"],
+        causes: ["Alergie", "Infekce", "Dráždivé látky"],
+        treatment: ["Nosní spreje", "Antihistaminika", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Hygiena"],
+        description: "Chronická rýma je dlouhodobý zánět nosní sliznice, často alergického původu."
+    },
+    {
+        name: "Chronický únavový syndrom",
+        category: "Neurologické/Imunitní",
+        severity: "Střední",
+        symptoms: ["Dlouhodobá únava", "Poruchy spánku", "Bolesti svalů", "Poruchy koncentrace"],
+        causes: ["Nejasné (pravděpodobně virové, imunitní, psychologické)"],
+        treatment: ["Podpůrná léčba", "Psychoterapie", "Rehabilitace"],
+        prevention: ["Zdravý životní styl", "Řešení stresu"],
+        description: "Chronický únavový syndrom je stav s dlouhodobou únavou bez jasné příčiny."
+    },
+    {
+        name: "Chřipka",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Kašel", "Bolest svalů", "Rýma", "Únava"],
+        causes: ["Virus chřipky (influenza)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Očkování", "Hygiena", "Vyhýbat se nemocným"],
+        description: "Chřipka je akutní virové onemocnění dýchacích cest, často s horečkou a bolestí svalů."
+    },
+    {
+        name: "Chudokrevnost (anémie)",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění"],
+        treatment: ["Doplňky železa", "Léčba příčiny", "Transfúze"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Chudokrevnost je stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+    {
+        name: "Hepatorenální syndrom",
+        category: "Jaterní/Ledvinné",
+        severity: "Vážná",
+        symptoms: ["Otoky", "Nízký výdej moči", "Únava", "Zhoršení jaterních funkcí"],
+        causes: ["Pokročilá jaterní cirhóza", "Selhání jater"],
+        treatment: ["Podpůrná léčba", "Transplantace jater"],
+        prevention: ["Prevence jaterních onemocnění", "Včasná léčba cirhózy"],
+        description: "Hepatorenální syndrom je selhání ledvin u pacientů s těžkým jaterním onemocněním."
+    },
+    {
+        name: "Histoplazmóza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Horečka", "Únava", "Bolest na hrudi"],
+        causes: ["Plísňová infekce (Histoplasma capsulatum)", "Vdechnutí spór z půdy"],
+        treatment: ["Antimykotika", "Podpůrná léčba"],
+        prevention: ["Vyhýbat se prašnému prostředí", "Ochranné pomůcky při práci se zeminou"],
+        description: "Histoplazmóza je plísňové onemocnění plic, častější v některých geografických oblastech."
+    },
+    {
+        name: "Hodgkinův lymfom",
+        category: "Onkologické",
+        severity: "Vážná",
+        symptoms: ["Zvětšené uzliny", "Noční pocení", "Horečka", "Úbytek hmotnosti"],
+        causes: ["Neznámé", "Genetické a virové faktory (EBV)"],
+        treatment: ["Chemoterapie", "Radioterapie", "Transplantace kostní dřeně"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Zhoubné nádorové onemocnění lymfatického systému, často s dobrými výsledky léčby."
+    },
+    {
+        name: "Horečka",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Zvýšená tělesná teplota", "Únava", "Pocení", "Bolest hlavy"],
+        causes: ["Infekce", "Zánět", "Imunitní reakce"],
+        treatment: ["Antipyretika", "Dostatek tekutin", "Léčba příčiny"],
+        prevention: ["Prevence infekcí", "Hygiena"],
+        description: "Horečka je zvýšená tělesná teplota jako reakce organismu na infekci nebo zánět."
+    },
+    {
+        name: "Horečka dengue",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Vysoká horečka", "Bolest svalů a kloubů", "Vyrážka", "Bolest hlavy"],
+        causes: ["Virus dengue", "Přenos komárem Aedes"],
+        treatment: ["Podpůrná léčba", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Ochrana proti komárům", "Prevence bodnutí"],
+        description: "Virové onemocnění přenášené komáry, časté v tropech."
+    },
+    {
+        name: "Horečka omladnic",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka po porodu", "Bolest břicha", "Zápach z rodidel", "Slabost"],
+        causes: ["Bakteriální infekce dělohy po porodu"],
+        treatment: ["Antibiotika", "Podpůrná léčba"],
+        prevention: ["Sterilita při porodu", "Včasná léčba infekcí"],
+        description: "Závažná infekce dělohy po porodu, dříve častá příčina úmrtí žen."
+    },
+    {
+        name: "Huntingtonova choroba",
+        category: "Neurologické/Genetické",
+        severity: "Vážná",
+        symptoms: ["Poruchy pohybu", "Změny chování", "Demence", "Poruchy řeči"],
+        causes: ["Genetická mutace (dědičné)"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče", "Psychologická pomoc"],
+        prevention: ["Genetické poradenství"],
+        description: "Vzácné dědičné neurodegenerativní onemocnění s progresivními pohybovými a psychickými poruchami."
+    },
+    {
+        name: "Hydrokéla",
+        category: "Urologické",
+        severity: "Mírná",
+        symptoms: ["Otok šourku", "Pocit tíhy", "Někdy bolest"],
+        causes: ["Nahromadění tekutiny v obalech varlete", "Poranění", "Infekce"],
+        treatment: ["Chirurgické odstranění tekutiny", "Pozorování (u dětí často vymizí)"],
+        prevention: ["Prevence poranění", "Léčba infekcí"],
+        description: "Hydrokéla je nahromadění tekutiny v obalech varlete, častější u dětí."
+    },
+    {
+        name: "Hyperaktivní močový měchýř",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Náhlé úniky moči"],
+        causes: ["Porucha nervového řízení močového měchýře", "Stárnutí", "Infekce"],
+        treatment: ["Rehabilitace pánevního dna", "Léky", "Změna životního stylu"],
+        prevention: ["Pravidelné močení", "Prevence infekcí"],
+        description: "Hyperaktivní močový měchýř je stav s častým nutkáním na močení a úniky moči."
+    },
+    {
+        name: "Hyperandrogenismus",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Nadměrné ochlupení", "Akné", "Poruchy menstruace", "Hlubší hlas"],
+        causes: ["Zvýšená produkce mužských hormonů", "Syndrom polycystických ovarií", "Nádory"],
+        treatment: ["Hormonální léčba", "Léky na snížení androgenů"],
+        prevention: ["Včasná diagnostika", "Zdravý životní styl"],
+        description: "Hyperandrogenismus je stav s nadbytkem mužských hormonů u žen."
+    },
+    {
+        name: "Hypertenze",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Často bez příznaků", "Bolest hlavy", "Závratě", "Únava"],
+        causes: ["Genetické faktory", "Nadváha", "Stres", "Nadměrný příjem soli"],
+        treatment: ["Léky na snížení tlaku", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Omezení soli", "Pravidelné kontroly"],
+        description: "Hypertenze je dlouhodobě zvýšený krevní tlak, zvyšuje riziko infarktu a mrtvice."
+    },
+    {
+        name: "Hypertyreóza (zvýšená funkce štítné žlázy)",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Nervozita", "Nespavost"],
+        causes: ["Graves-Basedowova nemoc", "Nodulární struma", "Nadměrný příjem hormonů"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Včasná diagnostika", "Kontrola hormonálních hladin"],
+        description: "Onemocnění štítné žlázy charakterizované nadměrnou produkcí hormonů."
+    },
+    {
+        name: "Hypochondrie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Přehnané obavy o zdraví", "Vyhledávání lékařské péče", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí"],
+        treatment: ["Psychoterapie", "Podpůrná léčba", "Někdy antidepresiva"],
+        prevention: ["Zdravý životní styl", "Podpora okolí"],
+        description: "Hypochondrie je psychická porucha s přehnanými obavami z vážné nemoci."
+    },
+    {
+        name: "Hypotenze",
+        category: "Kardiovaskulární",
+        severity: "Mírná",
+        symptoms: ["Závratě", "Slabost", "Mdloby", "Únava"],
+        causes: ["Dehydratace", "Krvácení", "Srdeční onemocnění", "Léky"],
+        treatment: ["Dostatek tekutin", "Zvýšení příjmu soli", "Léčba příčiny"],
+        prevention: ["Dostatek tekutin", "Opatrné vstávání"],
+        description: "Hypotenze je nízký krevní tlak, často způsobuje závratě a slabost."
+    },
+    {
+        name: "Hypotyreóza",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Přibývání na váze", "Suchá kůže", "Zácpa", "Zpomalení myšlení"],
+        causes: ["Autoimunitní zánět (Hashimotova tyreoiditida)", "Nedostatek jódu", "Poškození štítné žlázy"],
+        treatment: ["Substituce hormonů", "Dieta s dostatkem jódu"],
+        prevention: ["Dostatek jódu ve stravě", "Včasná diagnostika"],
+        description: "Onemocnění štítné žlázy způsobené nedostatečnou produkcí hormonů."
+    },
+    {
+        name: "Hypoxie",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Modrání rtů", "Závratě", "Ztráta vědomí"],
+        causes: ["Nedostatek kyslíku v krvi", "Plicní onemocnění", "Srdeční selhání"],
+        treatment: ["Podávání kyslíku", "Léčba základní příčiny"],
+        prevention: ["Prevence respiračních a srdečních onemocnění"],
+        description: "Hypoxie je nedostatek kyslíku v těle, může být život ohrožující."
+    },
+    {
+        name: "Charcotova osteoartropatie",
+        category: "Ortopedické/Diabetické",
+        severity: "Střední až vážná",
+        symptoms: ["Deformity nohy", "Otok", "Zarudnutí", "Bolest (často chybí)"],
+        causes: ["Diabetes mellitus", "Neuropatie"],
+        treatment: ["Odlehčení končetiny", "Ortopedická obuv", "Chirurgická léčba"],
+        prevention: ["Kontrola diabetu", "Pravidelné kontroly nohou"],
+        description: "Charcotova osteoartropatie je destrukce kostí a kloubů nohy u diabetiků s neuropatií."
+    },
+    {
+        name: "Chlamydie",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Pálení při močení", "Bolest v podbřišku", "Někdy bez příznaků"],
+        causes: ["Bakterie Chlamydia trachomatis", "Pohlavní styk"],
+        treatment: ["Antibiotika"],
+        prevention: ["Bezpečný sex", "Pravidelné testování"],
+        description: "Chlamydiová infekce je nejčastější pohlavně přenosná bakteriální infekce."
+    },
+    {
+        name: "Cholera",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vodnatý průjem", "Zvracení", "Dehydratace", "Křeče"],
+        causes: ["Bakterie Vibrio cholerae", "Kontaminovaná voda a potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)"],
+        prevention: ["Bezpečná voda", "Hygiena", "Očkování"],
+        description: "Cholera je akutní střevní infekce způsobující těžkou dehydrataci."
+    },
+    {
+        name: "Chrápání",
+        category: "Respirační",
+        severity: "Mírná až střední",
+        symptoms: ["Zvuk při dýchání ve spánku", "Narušení spánku", "Únava"],
+        causes: ["Uvolnění svalů hrdla", "Nadváha", "Alkohol", "Anatomické faktory"],
+        treatment: ["Změna polohy při spánku", "Redukce hmotnosti", "Léčba spánkové apnoe"],
+        prevention: ["Zdravý životní styl", "Omezení alkoholu"],
+        description: "Chrápání je zvuk vznikající při dýchání ve spánku, často neškodné, ale může být příznakem spánkové apnoe."
+    },
+    {
+        name: "Chronická bolest",
+        category: "Symptomatické",
+        severity: "Střední až vážná",
+        symptoms: ["Dlouhodobá bolest", "Únava", "Poruchy spánku", "Deprese"],
+        causes: ["Chronická onemocnění", "Poranění", "Neuropatie"],
+        treatment: ["Analgetika", "Fyzioterapie", "Psychoterapie"],
+        prevention: ["Včasná léčba akutní bolesti", "Zdravý životní styl"],
+        description: "Chronická bolest je bolest trvající déle než 3 měsíce, často vyžaduje komplexní léčbu."
+    },
+    {
+        name: "Chronická obstrukční plicní nemoc (CHOPN)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Kašel", "Vykašlávání hlenu", "Únava"],
+        causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory"],
+        treatment: ["Inhalátory", "Odvykání kouření", "Rehabilitace", "Kyslíková terapie"],
+        prevention: ["Nekouřit", "Vyhýbat se znečištěnému ovzduší"],
+        description: "CHOPN je chronické onemocnění plic způsobující zúžení dýchacích cest."
+    },
+    {
+        name: "Chronická rýma",
+        category: "Respirační",
+        severity: "Mírná",
+        symptoms: ["Dlouhodobá rýma", "Ucpaný nos", "Svědění", "Kýchání"],
+        causes: ["Alergie", "Infekce", "Dráždivé látky"],
+        treatment: ["Nosní spreje", "Antihistaminika", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Hygiena"],
+        description: "Chronická rýma je dlouhodobý zánět nosní sliznice, často alergického původu."
+    },
+    {
+        name: "Chronický únavový syndrom",
+        category: "Neurologické/Imunitní",
+        severity: "Střední",
+        symptoms: ["Dlouhodobá únava", "Poruchy spánku", "Bolesti svalů", "Poruchy koncentrace"],
+        causes: ["Nejasné (pravděpodobně virové, imunitní, psychologické)"],
+        treatment: ["Podpůrná léčba", "Psychoterapie", "Rehabilitace"],
+        prevention: ["Zdravý životní styl", "Řešení stresu"],
+        description: "Chronický únavový syndrom je stav s dlouhodobou únavou bez jasné příčiny."
+    },
+    {
+        name: "Chřipka",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Kašel", "Bolest svalů", "Rýma", "Únava"],
+        causes: ["Virus chřipky (influenza)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Očkování", "Hygiena", "Vyhýbat se nemocným"],
+        description: "Chřipka je akutní virové onemocnění dýchacích cest, často s horečkou a bolestí svalů."
+    },
+    {
+        name: "Chudokrevnost (anémie)",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění"],
+        treatment: ["Doplňky železa", "Léčba příčiny", "Transfúze"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Chudokrevnost je stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+    {
+        name: "Hepatorenální syndrom",
+        category: "Jaterní/Ledvinné",
+        severity: "Vážná",
+        symptoms: ["Otoky", "Nízký výdej moči", "Únava", "Zhoršení jaterních funkcí"],
+        causes: ["Pokročilá jaterní cirhóza", "Selhání jater"],
+        treatment: ["Podpůrná léčba", "Transplantace jater"],
+        prevention: ["Prevence jaterních onemocnění", "Včasná léčba cirhózy"],
+        description: "Hepatorenální syndrom je selhání ledvin u pacientů s těžkým jaterním onemocněním."
+    },
+    {
+        name: "Histoplazmóza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Horečka", "Únava", "Bolest na hrudi"],
+        causes: ["Plísňová infekce (Histoplasma capsulatum)", "Vdechnutí spór z půdy"],
+        treatment: ["Antimykotika", "Podpůrná léčba"],
+        prevention: ["Vyhýbat se prašnému prostředí", "Ochranné pomůcky při práci se zeminou"],
+        description: "Histoplazmóza je plísňové onemocnění plic, častější v některých geografických oblastech."
+    },
+    {
+        name: "Hodgkinův lymfom",
+        category: "Onkologické",
+        severity: "Vážná",
+        symptoms: ["Zvětšené uzliny", "Noční pocení", "Horečka", "Úbytek hmotnosti"],
+        causes: ["Neznámé", "Genetické a virové faktory (EBV)"],
+        treatment: ["Chemoterapie", "Radioterapie", "Transplantace kostní dřeně"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Zhoubné nádorové onemocnění lymfatického systému, často s dobrými výsledky léčby."
+    },
+    {
+        name: "Horečka",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Zvýšená tělesná teplota", "Únava", "Pocení", "Bolest hlavy"],
+        causes: ["Infekce", "Zánět", "Imunitní reakce"],
+        treatment: ["Antipyretika", "Dostatek tekutin", "Léčba příčiny"],
+        prevention: ["Prevence infekcí", "Hygiena"],
+        description: "Horečka je zvýšená tělesná teplota jako reakce organismu na infekci nebo zánět."
+    },
+    {
+        name: "Horečka dengue",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Vysoká horečka", "Bolest svalů a kloubů", "Vyrážka", "Bolest hlavy"],
+        causes: ["Virus dengue", "Přenos komárem Aedes"],
+        treatment: ["Podpůrná léčba", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Ochrana proti komárům", "Prevence bodnutí"],
+        description: "Virové onemocnění přenášené komáry, časté v tropech."
+    },
+    {
+        name: "Horečka omladnic",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka po porodu", "Bolest břicha", "Zápach z rodidel", "Slabost"],
+        causes: ["Bakteriální infekce dělohy po porodu"],
+        treatment: ["Antibiotika", "Podpůrná léčba"],
+        prevention: ["Sterilita při porodu", "Včasná léčba infekcí"],
+        description: "Závažná infekce dělohy po porodu, dříve častá příčina úmrtí žen."
+    },
+    {
+        name: "Huntingtonova choroba",
+        category: "Neurologické/Genetické",
+        severity: "Vážná",
+        symptoms: ["Poruchy pohybu", "Změny chování", "Demence", "Poruchy řeči"],
+        causes: ["Genetická mutace (dědičné)"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče", "Psychologická pomoc"],
+        prevention: ["Genetické poradenství"],
+        description: "Vzácné dědičné neurodegenerativní onemocnění s progresivními pohybovými a psychickými poruchami."
+    },
+    {
+        name: "Hydrokéla",
+        category: "Urologické",
+        severity: "Mírná",
+        symptoms: ["Otok šourku", "Pocit tíhy", "Někdy bolest"],
+        causes: ["Nahromadění tekutiny v obalech varlete", "Poranění", "Infekce"],
+        treatment: ["Chirurgické odstranění tekutiny", "Pozorování (u dětí často vymizí)"],
+        prevention: ["Prevence poranění", "Léčba infekcí"],
+        description: "Hydrokéla je nahromadění tekutiny v obalech varlete, častější u dětí."
+    },
+    {
+        name: "Hyperaktivní močový měchýř",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Náhlé úniky moči"],
+        causes: ["Porucha nervového řízení močového měchýře", "Stárnutí", "Infekce"],
+        treatment: ["Rehabilitace pánevního dna", "Léky", "Změna životního stylu"],
+        prevention: ["Pravidelné močení", "Prevence infekcí"],
+        description: "Hyperaktivní močový měchýř je stav s častým nutkáním na močení a úniky moči."
+    },
+    {
+        name: "Hyperandrogenismus",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Nadměrné ochlupení", "Akné", "Poruchy menstruace", "Hlubší hlas"],
+        causes: ["Zvýšená produkce mužských hormonů", "Syndrom polycystických ovarií", "Nádory"],
+        treatment: ["Hormonální léčba", "Léky na snížení androgenů"],
+        prevention: ["Včasná diagnostika", "Zdravý životní styl"],
+        description: "Hyperandrogenismus je stav s nadbytkem mužských hormonů u žen."
+    },
+    {
+        name: "Hypertenze",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Často bez příznaků", "Bolest hlavy", "Závratě", "Únava"],
+        causes: ["Genetické faktory", "Nadváha", "Stres", "Nadměrný příjem soli"],
+        treatment: ["Léky na snížení tlaku", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Omezení soli", "Pravidelné kontroly"],
+        description: "Hypertenze je dlouhodobě zvýšený krevní tlak, zvyšuje riziko infarktu a mrtvice."
+    },
+    {
+        name: "Hypertyreóza (zvýšená funkce štítné žlázy)",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Nervozita", "Nespavost"],
+        causes: ["Graves-Basedowova nemoc", "Nodulární struma", "Nadměrný příjem hormonů"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Včasná diagnostika", "Kontrola hormonálních hladin"],
+        description: "Onemocnění štítné žlázy charakterizované nadměrnou produkcí hormonů."
+    },
+    {
+        name: "Hypochondrie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Přehnané obavy o zdraví", "Vyhledávání lékařské péče", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí"],
+        treatment: ["Psychoterapie", "Podpůrná léčba", "Někdy antidepresiva"],
+        prevention: ["Zdravý životní styl", "Podpora okolí"],
+        description: "Hypochondrie je psychická porucha s přehnanými obavami z vážné nemoci."
+    },
+    {
+        name: "Hypotenze",
+        category: "Kardiovaskulární",
+        severity: "Mírná",
+        symptoms: ["Závratě", "Slabost", "Mdloby", "Únava"],
+        causes: ["Dehydratace", "Krvácení", "Srdeční onemocnění", "Léky"],
+        treatment: ["Dostatek tekutin", "Zvýšení příjmu soli", "Léčba příčiny"],
+        prevention: ["Dostatek tekutin", "Opatrné vstávání"],
+        description: "Hypotenze je nízký krevní tlak, často způsobuje závratě a slabost."
+    },
+    {
+        name: "Hypotyreóza",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Přibývání na váze", "Suchá kůže", "Zácpa", "Zpomalení myšlení"],
+        causes: ["Autoimunitní zánět (Hashimotova tyreoiditida)", "Nedostatek jódu", "Poškození štítné žlázy"],
+        treatment: ["Substituce hormonů", "Dieta s dostatkem jódu"],
+        prevention: ["Dostatek jódu ve stravě", "Včasná diagnostika"],
+        description: "Onemocnění štítné žlázy způsobené nedostatečnou produkcí hormonů."
+    },
+    {
+        name: "Hypoxie",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Modrání rtů", "Závratě", "Ztráta vědomí"],
+        causes: ["Nedostatek kyslíku v krvi", "Plicní onemocnění", "Srdeční selhání"],
+        treatment: ["Podávání kyslíku", "Léčba základní příčiny"],
+        prevention: ["Prevence respiračních a srdečních onemocnění"],
+        description: "Hypoxie je nedostatek kyslíku v těle, může být život ohrožující."
+    },
+    {
+        name: "Charcotova osteoartropatie",
+        category: "Ortopedické/Diabetické",
+        severity: "Střední až vážná",
+        symptoms: ["Deformity nohy", "Otok", "Zarudnutí", "Bolest (často chybí)"],
+        causes: ["Diabetes mellitus", "Neuropatie"],
+        treatment: ["Odlehčení končetiny", "Ortopedická obuv", "Chirurgická léčba"],
+        prevention: ["Kontrola diabetu", "Pravidelné kontroly nohou"],
+        description: "Charcotova osteoartropatie je destrukce kostí a kloubů nohy u diabetiků s neuropatií."
+    },
+    {
+        name: "Chlamydie",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Pálení při močení", "Bolest v podbřišku", "Někdy bez příznaků"],
+        causes: ["Bakterie Chlamydia trachomatis", "Pohlavní styk"],
+        treatment: ["Antibiotika"],
+        prevention: ["Bezpečný sex", "Pravidelné testování"],
+        description: "Chlamydiová infekce je nejčastější pohlavně přenosná bakteriální infekce."
+    },
+    {
+        name: "Cholera",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vodnatý průjem", "Zvracení", "Dehydratace", "Křeče"],
+        causes: ["Bakterie Vibrio cholerae", "Kontaminovaná voda a potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)"],
+        prevention: ["Bezpečná voda", "Hygiena", "Očkování"],
+        description: "Cholera je akutní střevní infekce způsobující těžkou dehydrataci."
+    },
+    {
+        name: "Chrápání",
+        category: "Respirační",
+        severity: "Mírná až střední",
+        symptoms: ["Zvuk při dýchání ve spánku", "Narušení spánku", "Únava"],
+        causes: ["Uvolnění svalů hrdla", "Nadváha", "Alkohol", "Anatomické faktory"],
+        treatment: ["Změna polohy při spánku", "Redukce hmotnosti", "Léčba spánkové apnoe"],
+        prevention: ["Zdravý životní styl", "Omezení alkoholu"],
+        description: "Chrápání je zvuk vznikající při dýchání ve spánku, často neškodné, ale může být příznakem spánkové apnoe."
+    },
+    {
+        name: "Chronická bolest",
+        category: "Symptomatické",
+        severity: "Střední až vážná",
+        symptoms: ["Dlouhodobá bolest", "Únava", "Poruchy spánku", "Deprese"],
+        causes: ["Chronická onemocnění", "Poranění", "Neuropatie"],
+        treatment: ["Analgetika", "Fyzioterapie", "Psychoterapie"],
+        prevention: ["Včasná léčba akutní bolesti", "Zdravý životní styl"],
+        description: "Chronická bolest je bolest trvající déle než 3 měsíce, často vyžaduje komplexní léčbu."
+    },
+    {
+        name: "Chronická obstrukční plicní nemoc (CHOPN)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Kašel", "Vykašlávání hlenu", "Únava"],
+        causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory"],
+        treatment: ["Inhalátory", "Odvykání kouření", "Rehabilitace", "Kyslíková terapie"],
+        prevention: ["Nekouřit", "Vyhýbat se znečištěnému ovzduší"],
+        description: "CHOPN je chronické onemocnění plic způsobující zúžení dýchacích cest."
+    },
+    {
+        name: "Chronická rýma",
+        category: "Respirační",
+        severity: "Mírná",
+        symptoms: ["Dlouhodobá rýma", "Ucpaný nos", "Svědění", "Kýchání"],
+        causes: ["Alergie", "Infekce", "Dráždivé látky"],
+        treatment: ["Nosní spreje", "Antihistaminika", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Hygiena"],
+        description: "Chronická rýma je dlouhodobý zánět nosní sliznice, často alergického původu."
+    },
+    {
+        name: "Chronický únavový syndrom",
+        category: "Neurologické/Imunitní",
+        severity: "Střední",
+        symptoms: ["Dlouhodobá únava", "Poruchy spánku", "Bolesti svalů", "Poruchy koncentrace"],
+        causes: ["Nejasné (pravděpodobně virové, imunitní, psychologické)"],
+        treatment: ["Podpůrná léčba", "Psychoterapie", "Rehabilitace"],
+        prevention: ["Zdravý životní styl", "Řešení stresu"],
+        description: "Chronický únavový syndrom je stav s dlouhodobou únavou bez jasné příčiny."
+    },
+    {
+        name: "Chřipka",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Kašel", "Bolest svalů", "Rýma", "Únava"],
+        causes: ["Virus chřipky (influenza)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Očkování", "Hygiena", "Vyhýbat se nemocným"],
+        description: "Chřipka je akutní virové onemocnění dýchacích cest, často s horečkou a bolestí svalů."
+    },
+    {
+        name: "Chudokrevnost (anémie)",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění"],
+        treatment: ["Doplňky železa", "Léčba příčiny", "Transfúze"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Chudokrevnost je stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+    {
+        name: "Hepatorenální syndrom",
+        category: "Jaterní/Ledvinné",
+        severity: "Vážná",
+        symptoms: ["Otoky", "Nízký výdej moči", "Únava", "Zhoršení jaterních funkcí"],
+        causes: ["Pokročilá jaterní cirhóza", "Selhání jater"],
+        treatment: ["Podpůrná léčba", "Transplantace jater"],
+        prevention: ["Prevence jaterních onemocnění", "Včasná léčba cirhózy"],
+        description: "Hepatorenální syndrom je selhání ledvin u pacientů s těžkým jaterním onemocněním."
+    },
+    {
+        name: "Histoplazmóza",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Kašel", "Horečka", "Únava", "Bolest na hrudi"],
+        causes: ["Plísňová infekce (Histoplasma capsulatum)", "Vdechnutí spór z půdy"],
+        treatment: ["Antimykotika", "Podpůrná léčba"],
+        prevention: ["Vyhýbat se prašnému prostředí", "Ochranné pomůcky při práci se zeminou"],
+        description: "Histoplazmóza je plísňové onemocnění plic, častější v některých geografických oblastech."
+    },
+    {
+        name: "Hodgkinův lymfom",
+        category: "Onkologické",
+        severity: "Vážná",
+        symptoms: ["Zvětšené uzliny", "Noční pocení", "Horečka", "Úbytek hmotnosti"],
+        causes: ["Neznámé", "Genetické a virové faktory (EBV)"],
+        treatment: ["Chemoterapie", "Radioterapie", "Transplantace kostní dřeně"],
+        prevention: ["Nelze spolehlivě předcházet"],
+        description: "Zhoubné nádorové onemocnění lymfatického systému, často s dobrými výsledky léčby."
+    },
+    {
+        name: "Horečka",
+        category: "Symptomatické",
+        severity: "Mírná až střední",
+        symptoms: ["Zvýšená tělesná teplota", "Únava", "Pocení", "Bolest hlavy"],
+        causes: ["Infekce", "Zánět", "Imunitní reakce"],
+        treatment: ["Antipyretika", "Dostatek tekutin", "Léčba příčiny"],
+        prevention: ["Prevence infekcí", "Hygiena"],
+        description: "Horečka je zvýšená tělesná teplota jako reakce organismu na infekci nebo zánět."
+    },
+    {
+        name: "Horečka dengue",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Vysoká horečka", "Bolest svalů a kloubů", "Vyrážka", "Bolest hlavy"],
+        causes: ["Virus dengue", "Přenos komárem Aedes"],
+        treatment: ["Podpůrná léčba", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Ochrana proti komárům", "Prevence bodnutí"],
+        description: "Virové onemocnění přenášené komáry, časté v tropech."
+    },
+    {
+        name: "Horečka omladnic",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vysoká horečka po porodu", "Bolest břicha", "Zápach z rodidel", "Slabost"],
+        causes: ["Bakteriální infekce dělohy po porodu"],
+        treatment: ["Antibiotika", "Podpůrná léčba"],
+        prevention: ["Sterilita při porodu", "Včasná léčba infekcí"],
+        description: "Závažná infekce dělohy po porodu, dříve častá příčina úmrtí žen."
+    },
+    {
+        name: "Huntingtonova choroba",
+        category: "Neurologické/Genetické",
+        severity: "Vážná",
+        symptoms: ["Poruchy pohybu", "Změny chování", "Demence", "Poruchy řeči"],
+        causes: ["Genetická mutace (dědičné)"],
+        treatment: ["Symptomatická léčba", "Podpůrná péče", "Psychologická pomoc"],
+        prevention: ["Genetické poradenství"],
+        description: "Vzácné dědičné neurodegenerativní onemocnění s progresivními pohybovými a psychickými poruchami."
+    },
+    {
+        name: "Hydrokéla",
+        category: "Urologické",
+        severity: "Mírná",
+        symptoms: ["Otok šourku", "Pocit tíhy", "Někdy bolest"],
+        causes: ["Nahromadění tekutiny v obalech varlete", "Poranění", "Infekce"],
+        treatment: ["Chirurgické odstranění tekutiny", "Pozorování (u dětí často vymizí)"],
+        prevention: ["Prevence poranění", "Léčba infekcí"],
+        description: "Hydrokéla je nahromadění tekutiny v obalech varlete, častější u dětí."
+    },
+    {
+        name: "Hyperaktivní močový měchýř",
+        category: "Urologické",
+        severity: "Mírná až střední",
+        symptoms: ["Časté močení", "Nutkání na močení", "Náhlé úniky moči"],
+        causes: ["Porucha nervového řízení močového měchýře", "Stárnutí", "Infekce"],
+        treatment: ["Rehabilitace pánevního dna", "Léky", "Změna životního stylu"],
+        prevention: ["Pravidelné močení", "Prevence infekcí"],
+        description: "Hyperaktivní močový měchýř je stav s častým nutkáním na močení a úniky moči."
+    },
+    {
+        name: "Hyperandrogenismus",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Nadměrné ochlupení", "Akné", "Poruchy menstruace", "Hlubší hlas"],
+        causes: ["Zvýšená produkce mužských hormonů", "Syndrom polycystických ovarií", "Nádory"],
+        treatment: ["Hormonální léčba", "Léky na snížení androgenů"],
+        prevention: ["Včasná diagnostika", "Zdravý životní styl"],
+        description: "Hyperandrogenismus je stav s nadbytkem mužských hormonů u žen."
+    },
+    {
+        name: "Hypertenze",
+        category: "Kardiovaskulární",
+        severity: "Střední",
+        symptoms: ["Často bez příznaků", "Bolest hlavy", "Závratě", "Únava"],
+        causes: ["Genetické faktory", "Nadváha", "Stres", "Nadměrný příjem soli"],
+        treatment: ["Léky na snížení tlaku", "Dieta", "Pohyb"],
+        prevention: ["Zdravý životní styl", "Omezení soli", "Pravidelné kontroly"],
+        description: "Hypertenze je dlouhodobě zvýšený krevní tlak, zvyšuje riziko infarktu a mrtvice."
+    },
+    {
+        name: "Hypertyreóza (zvýšená funkce štítné žlázy)",
+        category: "Endokrinní",
+        severity: "Střední až vážná",
+        symptoms: ["Hubnutí", "Zrychlený tep", "Pocení", "Nervozita", "Nespavost"],
+        causes: ["Graves-Basedowova nemoc", "Nodulární struma", "Nadměrný příjem hormonů"],
+        treatment: ["Antithyroidní léky", "Radiojódová terapie", "Chirurgická léčba"],
+        prevention: ["Včasná diagnostika", "Kontrola hormonálních hladin"],
+        description: "Onemocnění štítné žlázy charakterizované nadměrnou produkcí hormonů."
+    },
+    {
+        name: "Hypochondrie",
+        category: "Psychiatrické",
+        severity: "Mírná až střední",
+        symptoms: ["Přehnané obavy o zdraví", "Vyhledávání lékařské péče", "Úzkost"],
+        causes: ["Psychologické faktory", "Stres", "Nízké sebevědomí"],
+        treatment: ["Psychoterapie", "Podpůrná léčba", "Někdy antidepresiva"],
+        prevention: ["Zdravý životní styl", "Podpora okolí"],
+        description: "Hypochondrie je psychická porucha s přehnanými obavami z vážné nemoci."
+    },
+    {
+        name: "Hypotenze",
+        category: "Kardiovaskulární",
+        severity: "Mírná",
+        symptoms: ["Závratě", "Slabost", "Mdloby", "Únava"],
+        causes: ["Dehydratace", "Krvácení", "Srdeční onemocnění", "Léky"],
+        treatment: ["Dostatek tekutin", "Zvýšení příjmu soli", "Léčba příčiny"],
+        prevention: ["Dostatek tekutin", "Opatrné vstávání"],
+        description: "Hypotenze je nízký krevní tlak, často způsobuje závratě a slabost."
+    },
+    {
+        name: "Hypotyreóza",
+        category: "Endokrinní",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Přibývání na váze", "Suchá kůže", "Zácpa", "Zpomalení myšlení"],
+        causes: ["Autoimunitní zánět (Hashimotova tyreoiditida)", "Nedostatek jódu", "Poškození štítné žlázy"],
+        treatment: ["Substituce hormonů", "Dieta s dostatkem jódu"],
+        prevention: ["Dostatek jódu ve stravě", "Včasná diagnostika"],
+        description: "Onemocnění štítné žlázy způsobené nedostatečnou produkcí hormonů."
+    },
+    {
+        name: "Hypoxie",
+        category: "Respirační/Kardiovaskulární",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Modrání rtů", "Závratě", "Ztráta vědomí"],
+        causes: ["Nedostatek kyslíku v krvi", "Plicní onemocnění", "Srdeční selhání"],
+        treatment: ["Podávání kyslíku", "Léčba základní příčiny"],
+        prevention: ["Prevence respiračních a srdečních onemocnění"],
+        description: "Hypoxie je nedostatek kyslíku v těle, může být život ohrožující."
+    },
+    {
+        name: "Charcotova osteoartropatie",
+        category: "Ortopedické/Diabetické",
+        severity: "Střední až vážná",
+        symptoms: ["Deformity nohy", "Otok", "Zarudnutí", "Bolest (často chybí)"],
+        causes: ["Diabetes mellitus", "Neuropatie"],
+        treatment: ["Odlehčení končetiny", "Ortopedická obuv", "Chirurgická léčba"],
+        prevention: ["Kontrola diabetu", "Pravidelné kontroly nohou"],
+        description: "Charcotova osteoartropatie je destrukce kostí a kloubů nohy u diabetiků s neuropatií."
+    },
+    {
+        name: "Chlamydie",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Pálení při močení", "Bolest v podbřišku", "Někdy bez příznaků"],
+        causes: ["Bakterie Chlamydia trachomatis", "Pohlavní styk"],
+        treatment: ["Antibiotika"],
+        prevention: ["Bezpečný sex", "Pravidelné testování"],
+        description: "Chlamydiová infekce je nejčastější pohlavně přenosná bakteriální infekce."
+    },
+    {
+        name: "Cholera",
+        category: "Infekční",
+        severity: "Vážná",
+        symptoms: ["Vodnatý průjem", "Zvracení", "Dehydratace", "Křeče"],
+        causes: ["Bakterie Vibrio cholerae", "Kontaminovaná voda a potraviny"],
+        treatment: ["Rehydratace", "Antibiotika (v těžkých případech)"],
+        prevention: ["Bezpečná voda", "Hygiena", "Očkování"],
+        description: "Cholera je akutní střevní infekce způsobující těžkou dehydrataci."
+    },
+    {
+        name: "Chrápání",
+        category: "Respirační",
+        severity: "Mírná až střední",
+        symptoms: ["Zvuk při dýchání ve spánku", "Narušení spánku", "Únava"],
+        causes: ["Uvolnění svalů hrdla", "Nadváha", "Alkohol", "Anatomické faktory"],
+        treatment: ["Změna polohy při spánku", "Redukce hmotnosti", "Léčba spánkové apnoe"],
+        prevention: ["Zdravý životní styl", "Omezení alkoholu"],
+        description: "Chrápání je zvuk vznikající při dýchání ve spánku, často neškodné, ale může být příznakem spánkové apnoe."
+    },
+    {
+        name: "Chronická bolest",
+        category: "Symptomatické",
+        severity: "Střední až vážná",
+        symptoms: ["Dlouhodobá bolest", "Únava", "Poruchy spánku", "Deprese"],
+        causes: ["Chronická onemocnění", "Poranění", "Neuropatie"],
+        treatment: ["Analgetika", "Fyzioterapie", "Psychoterapie"],
+        prevention: ["Včasná léčba akutní bolesti", "Zdravý životní styl"],
+        description: "Chronická bolest je bolest trvající déle než 3 měsíce, často vyžaduje komplexní léčbu."
+    },
+    {
+        name: "Chronická obstrukční plicní nemoc (CHOPN)",
+        category: "Respirační",
+        severity: "Střední až vážná",
+        symptoms: ["Dušnost", "Kašel", "Vykašlávání hlenu", "Únava"],
+        causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory"],
+        treatment: ["Inhalátory", "Odvykání kouření", "Rehabilitace", "Kyslíková terapie"],
+        prevention: ["Nekouřit", "Vyhýbat se znečištěnému ovzduší"],
+        description: "CHOPN je chronické onemocnění plic způsobující zúžení dýchacích cest."
+    },
+    {
+        name: "Chronická rýma",
+        category: "Respirační",
+        severity: "Mírná",
+        symptoms: ["Dlouhodobá rýma", "Ucpaný nos", "Svědění", "Kýchání"],
+        causes: ["Alergie", "Infekce", "Dráždivé látky"],
+        treatment: ["Nosní spreje", "Antihistaminika", "Vyhýbání se alergenům"],
+        prevention: ["Omezení kontaktu s alergeny", "Hygiena"],
+        description: "Chronická rýma je dlouhodobý zánět nosní sliznice, často alergického původu."
+    },
+    {
+        name: "Chronický únavový syndrom",
+        category: "Neurologické/Imunitní",
+        severity: "Střední",
+        symptoms: ["Dlouhodobá únava", "Poruchy spánku", "Bolesti svalů", "Poruchy koncentrace"],
+        causes: ["Nejasné (pravděpodobně virové, imunitní, psychologické)"],
+        treatment: ["Podpůrná léčba", "Psychoterapie", "Rehabilitace"],
+        prevention: ["Zdravý životní styl", "Řešení stresu"],
+        description: "Chronický únavový syndrom je stav s dlouhodobou únavou bez jasné příčiny."
+    },
+    {
+        name: "Chřipka",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Horečka", "Kašel", "Bolest svalů", "Rýma", "Únava"],
+        causes: ["Virus chřipky (influenza)", "Kapénková infekce"],
+        treatment: ["Klid na lůžku", "Dostatek tekutin", "Antipyretika"],
+        prevention: ["Očkování", "Hygiena", "Vyhýbat se nemocným"],
+        description: "Chřipka je akutní virové onemocnění dýchacích cest, často s horečkou a bolestí svalů."
+    },
+    {
+        name: "Chudokrevnost (anémie)",
+        category: "Hematologické",
+        severity: "Mírná až střední",
+        symptoms: ["Únava", "Bledost", "Dušnost", "Bušení srdce"],
+        causes: ["Nedostatek železa", "Krvácení", "Chronická onemocnění"],
+        treatment: ["Doplňky železa", "Léčba příčiny", "Transfúze"],
+        prevention: ["Vyvážená strava", "Léčba chronických nemocí"],
+        description: "Chudokrevnost je stav charakterizovaný sníženým množstvím červených krvinek nebo hemoglobinu."
+    },
+    {
+        name: "Gynekologické záněty",
+        category: "Gynekologické/Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Výtok", "Svědění", "Bolest v podbřišku", "Zápach"],
+        causes: ["Bakteriální infekce", "Kvasinky", "Pohlavně přenosné infekce"],
+        treatment: ["Antibiotika", "Antimykotika", "Lokální léčba"],
+        prevention: ["Hygiena", "Bezpečný sex"],
+        description: "Záněty ženských pohlavních orgánů způsobené infekcí, projevují se výtokem a bolestí."
+    },
+    {
+        name: "HPV virus",
+        category: "Infekční",
+        severity: "Mírná až střední",
+        symptoms: ["Genitální bradavice", "Někdy bez příznaků", "Změny na děložním čípku"],
+        causes: ["Infekce lidským papilomavirem (HPV)", "Pohlavní styk"],
+        treatment: ["Odstranění bradavic", "Podpůrná léčba", "Pravidelné gynekologické kontroly"],
+        prevention: ["Očkování proti HPV", "Bezpečný sex"],
+        description: "HPV je skupina virů, které mohou způsobit genitální bradavice a jsou hlavní příčinou rakoviny děložního čípku."
+    },
+    {
+        name: "Hemangiom",
+        category: "Kožní/Nádorové",
+        severity: "Mírná",
+        symptoms: ["Červený nebo modrý útvar na kůži", "Rychlý růst v dětství", "Krvácení (vzácně)"],
+        causes: ["Vrozená cévní malformace"],
+        treatment: ["Pozorování", "Laserová terapie", "Chirurgické odstranění (vzácně)"],
+        prevention: ["Nelze předcházet (vrozené)"],
+        description: "Hemangiom je nezhoubný cévní nádor, často se vyskytuje u kojenců a většinou spontánně vymizí."
+    },
+    {
+        name: "Hemeroidy",
+        category: "Trávicí",
+        severity: "Mírná až střední",
+        symptoms: ["Krvácení při stolici", "Svědění", "Bolest", "Vypouklé uzlíky v oblasti konečníku"],
+        causes: ["Zvýšený tlak v žilách konečníku", "Zácpa", "Těhotenství", "Dlouhé sezení"],
+        treatment: ["Masti", "Dieta s vlákninou", "Chirurgické odstranění (u těžkých případů)"],
+        prevention: ["Dostatek vlákniny", "Dostatek tekutin", "Pravidelný pohyb"],
+        description: "Hemeroidy jsou rozšířené žíly v oblasti konečníku, často způsobují krvácení a bolest."
+    },
+    {
+        name: "Hemochromatóza",
+        category: "Metabolické/Genetické",
+        severity: "Střední",
+        symptoms: ["Únava", "Bolest kloubů", "Zvětšení jater", "Tmavnutí kůže"],
+        causes: ["Genetická porucha metabolismu železa"],
+        treatment: ["Pravidelné odběry krve", "Dieta s nízkým obsahem železa"],
+        prevention: ["Genetické poradenství", "Včasná diagnostika"],
+        description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
+    },
+    {
+        name: "Hemofilie",
+        category: "Hematologické/Genetické",
+        severity: "Střední až vážná",
+        symptoms: ["Krvácení do kloubů a svalů", "Snadná tvorba modřin", "Dlouhé krvácení po úrazu"],
+        causes: ["Genetický nedostatek srážecích faktorů krve"],
+        treatment: ["Podávání srážecích faktorů", "Prevence úrazů"],
+        prevention: ["Genetické poradenství", "Vyhýbání se rizikovým aktivitám"],
+        description: "Hemofilie je dědičné onemocnění s poruchou srážlivosti krve."
+    },
+    {
+        name: "Hepatitida",
+        category: "Infekční",
+        severity: "Střední až vážná",
+        symptoms: ["Žloutenka", "Únava", "Bolest v pravém podžebří", "Nevolnost"],
+        causes: ["Virová infekce (hepatitida A, B, C...)", "Alkohol", "Léky"],
+        treatment: ["Antivirotika (u některých typů)", "Podpůrná léčba", "Dieta"],
+        prevention: ["Očkování (A, B)", "Bezpečný sex", "Hygiena"],
+        description: "Hepatitida je zánět jater způsobený nejčastěji viry, ale i alkoholem nebo léky."
+    },
+];
+
+        let filteredDiseases = [...diseases];
+        let currentCategory = 'all';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDiseaseCount();
+            renderDiseases();
+            setupEventListeners();
+        });
+
+        function updateDiseaseCount() {
+            document.getElementById('diseaseCount').textContent = filteredDiseases.length;
+        }
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filterDiseases(searchTerm, currentCategory);
+            });
+
+            // Category filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update active button
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white');
+                        b.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.add('active', 'bg-primary', 'text-white');
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+
+                    currentCategory = this.dataset.category;
+                    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                    filterDiseases(searchTerm, currentCategory);
+                });
+            });
+
+            // Modal functionality
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('diseaseModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+        }
+
+        function filterDiseases(searchTerm, category) {
+            filteredDiseases = diseases.filter(disease => {
+                const matchesSearch = !searchTerm || 
+                    disease.name.toLowerCase().includes(searchTerm) ||
+                    disease.category.toLowerCase().includes(searchTerm) ||
+                    disease.symptoms.some(symptom => symptom.toLowerCase().includes(searchTerm)) ||
+                    disease.description.toLowerCase().includes(searchTerm);
+
+                const matchesCategory = category === 'all' || disease.category === category;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            updateDiseaseCount();
+            renderDiseases();
+        }
+
+        function renderDiseases() {
+            const grid = document.getElementById('diseaseGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredDiseases.length === 0) {
+                grid.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            noResults.classList.add('hidden');
+
+            grid.innerHTML = filteredDiseases.map(disease => `
+                <div class="disease-card bg-white rounded-lg shadow-sm border border-gray-200 p-6 cursor-pointer fade-in" onclick="showDiseaseDetail('${disease.name}')">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-lg text-gray-900">${disease.name}</h3>
+                        <span class="px-2 py-1 text-xs rounded-full ${getSeverityColor(disease.severity)}">
+                            ${disease.severity}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3">${disease.category}</p>
+                    <p class="text-gray-700 text-sm leading-relaxed mb-4">${disease.description}</p>
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-900 mb-2 text-sm">Hlavní příznaky:</h4>
+                        <div class="flex flex-wrap gap-1">
+                            ${disease.symptoms.slice(0, 3).map(symptom => 
+                                `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${symptom}</span>`
+                            ).join('')}
+                            ${disease.symptoms.length > 3 ? `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">+${disease.symptoms.length - 3} dalších</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-secondary transition-colors text-sm font-medium">
+                        Zobrazit podrobnosti
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getSeverityColor(severity) {
+            switch(severity) {
+                case 'Velmi vážná':
+                    return 'bg-red-100 text-red-800';
+                case 'Vážná':
+                    return 'bg-red-100 text-red-700';
+                case 'Střední až vážná':
+                    return 'bg-orange-100 text-orange-700';
+                case 'Střední':
+                    return 'bg-yellow-100 text-yellow-700';
+                case 'Mírná až střední':
+                    return 'bg-yellow-100 text-yellow-600';
+                case 'Mírná':
+                    return 'bg-green-100 text-green-700';
+                default:
+                    return 'bg-gray-100 text-gray-700';
+            }
+        }
+
+        function showDiseaseDetail(diseaseName) {
+            const disease = diseases.find(d => d.name === diseaseName);
+            if (!disease) return;
+
+            document.getElementById('modalTitle').textContent = disease.name;
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">${disease.category}</span>
+                        <span class="px-3 py-1 rounded-full text-sm ${getSeverityColor(disease.severity)}">${disease.severity}</span>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Popis</h3>
+                        <p class="text-gray-700 leading-relaxed">${disease.description}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-3">Příznaky</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${disease.symptoms.map(symptom => 
+                                `<div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                    <span class="text-gray-700 text-sm">${symptom}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-3">Příčiny</h3>
+                        <div class="space-y-1">
+                            ${disease.causes.map(cause => 
+                                `<div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-orange-400 rounded-full"></div>
+                                    <span class="text-gray-700 text-sm">${cause}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-3">Léčba</h3>
+                        <div class="space-y-1">
+                            ${disease.treatment.map(treatment => 
+                                `<div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span class="text-gray-700 text-sm">${treatment}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-3">Prevence</h3>
+                        <div class="space-y-1">
+                            ${disease.prevention.map(prevention => 
+                                `<div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                                    <span class="text-gray-700 text-sm">${prevention}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div>
+                                <h4 class="font-medium text-yellow-800 mb-1">Důležité upozornění</h4>
+                                <p class="text-sm text-yellow-700">Tyto informace slouží pouze pro vzdělávací účely a nenahrazují odbornou lékařskou konzultaci, diagnózu nebo léčbu. Vždy se poraďte s kvalifikovaným zdravotnickým pracovníkem.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('diseaseModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('diseaseModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
