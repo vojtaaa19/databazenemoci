@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 
@@ -6,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zdravotní Encyklopedie - Kompletní databáze nemocí</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -25,6 +27,39 @@
         }
     </script>
     <style>
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            .disease-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            .filter-btn, .severity-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            #searchInput {
+                padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+                font-size: 1rem;
+            }
+            .disease-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .disease-card {
             transition: all 0.3s ease;
         }
@@ -1580,6 +1615,136 @@
                 prevention: ["Genetické poradenství", "Včasná diagnostika"],
                 description: "Hemochromatóza je dědičné onemocnění způsobující nadměrné ukládání železa v těle."
             },
+            {
+                name: "Cukrovka 2. typu",
+                category: "Metabolické",
+                severity: "Střední",
+                symptoms: ["Žízeň", "Časté močení", "Únava", "Rozmazané vidění", "Pomalé hojení ran"],
+                causes: ["Obezita", "Nedostatek pohybu", "Genetické předpoklady", "Nevhodná strava"],
+                treatment: ["Perorální antidiabetika", "Inzulín", "Dieta", "Pravidelný pohyb"],
+                prevention: ["Zdravá strava", "Pravidelná fyzická aktivita", "Udržování zdravé hmotnosti"],
+                description: "Chronické metabolické onemocnění charakterizované zvýšenou hladinou cukru v krvi."
+            },
+            {
+                name: "Zánět průdušek (Bronchitida)",
+                category: "Respirační",
+                severity: "Mírná",
+                symptoms: ["Kašel", "Hleny", "Dušnost", "Bolest na hrudi", "Teplota"],
+                causes: ["Virová infekce", "Kouření", "Znečištěné ovzduší", "Bakteriální infekce"],
+                treatment: ["Klid na lůžku", "Dostatek tekutin", "Léky na kašel", "Antibiotika (při bakteriální infekci)"],
+                prevention: ["Nekouřit", "Očkování proti chřipce a pneumokokům", "Posilování imunity"],
+                description: "Zánět výstelky průdušek, který způsobuje kašel a tvorbu hlenů."
+            },
+            {
+                name: "Migréna",
+                category: "Neurologické",
+                severity: "Střední",
+                symptoms: ["Silná pulzující bolest hlavy", "Nevolnost", "Zvracení", "Citlivost na světlo a zvuk"],
+                causes: ["Stres", "Hormonální změny", "Nedostatek spánku", "Některé potraviny", "Dehydratace"],
+                treatment: ["Léky proti bolesti", "Triptany", "Klid na tmavém tichém místě", "Dostatek tekutin"],
+                prevention: ["Pravidelný spánek", "Vyhýbání se spouštěčům", "Pravidelná strava", "Dostatečný pitný režim"],
+                description: "Opakující se silné bolesti hlavy, často doprovázené nevolností a citlivostí na světlo a zvuk."
+            },
+            {
+                name: "Artritida",
+                category: "Ortopedické",
+                severity: "Střední",
+                symptoms: ["Bolest kloubů", "Ztuhlost", "Otoky", "Omezená pohyblivost", "Zarudnutí kůže"],
+                causes: ["Věk", "Obezita", "Genetika", "Předchozí poranění kloubů", "Infekce"],
+                treatment: ["Protizánětlivé léky", "Fyzioterapie", "Chirurgický zákrok", "Kortikosteroidy"],
+                prevention: ["Udržování zdravé hmotnosti", "Pravidelný pohyb", "Zdravá strava bohatá na antioxidanty"],
+                description: "Zánětlivé onemocnění kloubů způsobující bolest a ztuhlost, které se s věkem může zhoršovat."
+            },
+            {
+                name: "Deprese",
+                category: "Psychiatrické",
+                severity: "Vážná",
+                symptoms: ["Smutek", "Ztráta zájmu o koníčky", "Únava", "Poruchy spánku", "Pocity beznaděje"],
+                causes: ["Biologické faktory", "Chemie mozku", "Genetika", "Životní události", "Zdravotní problémy"],
+                treatment: ["Psychoterapie", "Antidepresiva", "Pravidelný režim", "Fyzická aktivita", "Sociální podpora"],
+                prevention: ["Zvládání stresu", "Pravidelná fyzická aktivita", "Udržování sociálních vztahů"],
+                description: "Závažná duševní porucha charakterizovaná přetrvávajícím smutkem a ztrátou zájmu o aktivity."
+            },
+            {
+                name: "Žaludeční vředy",
+                category: "Trávicí",
+                severity: "Střední",
+                symptoms: ["Bolest břicha", "Pálení žáhy", "Nevolnost", "Nadýmání", "Zvracení krve"],
+                causes: ["Bakterie Helicobacter pylori", "Dlouhodobé užívání léků proti bolesti", "Kouření", "Stres"],
+                treatment: ["Antibiotika", "Léky snižující kyselost žaludku", "Změna stravovacích návyků", "Vynechání dráždivých léků"],
+                prevention: ["Vyhýbání se kouření", "Omezení alkoholu", "Zdravá strava", "Zvládání stresu"],
+                description: "Bolestivé vředy ve výstelce žaludku nebo dvanáctníku, často způsobené bakteriální infekcí."
+            },
+            {
+                name: "Astma",
+                category: "Respirační",
+                severity: "Střední",
+                symptoms: ["Dušnost", "Sípání", "Tlak na hrudi", "Kašel (zejména v noci)"],
+                causes: ["Alergie", "Dědičnost", "Kouření (aktivní i pasivní)", "Znečištěné ovzduší"],
+                treatment: ["Inhalační kortikosteroidy", "Bronchodilatancia", "Antileukotrieny", "Alergenová imunoterapie"],
+                prevention: ["Vyhýbání se spouštěčům", "Pravidelné užívání léků", "Nekouřit", "Pravidelná fyzická aktivita"],
+                description: "Chronické zánětlivé onemocnění dýchacích cest způsobující zúžení průdušek a dýchací obtíže."
+            },
+            {
+                name: "Hypertenze (Vysoký krevní tlak)",
+                category: "Kardiovaskulární",
+                severity: "Vážná",
+                symptoms: ["Bolesti hlavy", "Závratě", "Únava", "Nepravidelný srdeční rytmus", "Problémy s viděním"],
+                causes: ["Nadváha", "Nedostatek pohybu", "Nadměrný příjem soli", "Stres", "Genetika"],
+                treatment: ["Léky na snížení krevního tlaku", "Změna životního stylu", "Snížení hmotnosti", "Omezení alkoholu"],
+                prevention: ["Zdravá strava (DASH dieta)", "Pravidelná fyzická aktivita", "Omezení soli", "Nekouřit"],
+                description: "Chronické onemocnění charakterizované trvale zvýšeným krevním tlakem, které může vést k vážným zdravotním komplikacím."
+            },
+            {
+                name: "Srdeční selhání",
+                category: "Kardiovaskulární",
+                severity: "Vážná",
+                symptoms: ["Dušnost", "Únava", "Otoky nohou a kotníků", "Nepravidelný srdeční rytmus", "Náhlý přírůstek hmotnosti"],
+                causes: ["Ischemická choroba srdeční", "Infarkt myokardu", "Vysoký krevní tlak", "Cukrovka", "Srdeční vady"],
+                treatment: ["Léky na podporu srdeční funkce", "Omezení příjmu soli", "Diuretika", "Chirurgické zákroky"],
+                prevention: ["Kontrola krevního tlaku", "Zdravá strava", "Pravidelná fyzická aktivita", "Nekouřit"],
+                description: "Stav, kdy srdce není schopno dostatečně zásobovat tělo okysličenou krví. Může být akutní nebo chronický a vyžaduje odborné lékařské vedení."
+            },
+            {
+                name: "Arytmie",
+                category: "Kardiovaskulární",
+                severity: "Střední až vážná",
+                symptoms: ["Bušení srdce", "Závratě", "Dušnost", "Bolest na hrudi", "Únava"],
+                causes: ["Srdeční onemocnění", "Vysoký krevní tlak", "Cukrovka", "Nadměrná konzumace kofeinu", "Stres"],
+                treatment: ["Léky na úpravu srdečního rytmu", "Kardiostimulátor", "Kardioverze", "Ablace"],
+                prevention: ["Zdravý životní styl", "Omezení kofeinu a alkoholu", "Kontrola krevního tlaku", "Pravidelná lékařská vyšetření"],
+                description: "Porucha srdečního rytmu, která může být neškodná, ale i život ohrožující. Projevuje se nepravidelným, příliš rychlým nebo pomalým tepem."
+            },
+            {
+                name: "Ischemická choroba srdeční",
+                category: "Kardiovaskulární",
+                severity: "Vážná",
+                symptoms: ["Bolest na hrudi (angina pectoris)", "Dušnost", "Únava", "Nepravidelný srdeční rytmus"],
+                causes: ["Ateroskleróza", "Vysoký krevní tlak", "Kouření", "Vysoký cholesterol", "Cukrovka"],
+                treatment: ["Léky na ředění krve", "Angioplastika", "Bypass", "Změna životního stylu"],
+                prevention: ["Nekouřit", "Zdravá strava", "Pravidelná fyzická aktivita", "Kontrola krevního tlaku a cholesterolu"],
+                description: "Onemocnění způsobené zúžením věnčitých tepen, které zásobují srdce krví. Může vést k infarktu myokardu."
+            },
+            {
+                name: "Infarkt myokardu",
+                category: "Kardiovaskulární",
+                severity: "Kritická",
+                symptoms: ["Intenzivní tlak nebo bolest na hrudi", "Bolest vystřelující do paže, krku nebo čelisti", "Dušnost", "Nevolnost", "Studený pot"],
+                causes: ["Ucpání věnčité tepny krevní sraženinou", "Ateroskleróza", "Kouření", "Vysoký krevní tlak"],
+                treatment: ["Okamžitá lékařská pomoc", "Angioplastika", "Léky na rozpuštění sraženin", "Rehabilitace"],
+                prevention: ["Nekouřit", "Zdravá strava", "Pravidelná fyzická aktivita", "Kontrola krevního tlaku a cholesterolu"],
+                description: "Život ohrožující stav způsobený náhlým přerušením průtoku krve do části srdečního svalu, což vede k odumření srdeční tkáně."
+            },
+            {
+                name: "Kardiomyopatie",
+                category: "Kardiovaskulární",
+                severity: "Vážná",
+                symptoms: ["Dušnost při námaze i v klidu", "Otoky nohou a kotníků", "Nadýmání břicha", "Nepravidelný srdeční rytmus", "Závratě"],
+                causes: ["Dědičné faktory", "Virové infekce", "Vysoký krevní tlak", "Poruchy srdeční chlopně", "Nadměrná konzumace alkoholu"],
+                treatment: ["Léky na podporu srdeční funkce", "Implantace kardioverteru-defibrilátoru", "Transplantace srdce"],
+                prevention: ["Zdravý životní styl", "Omezení alkoholu", "Léčba vysokého krevního tlaku", "Pravidelná lékařská vyšetření"],
+                description: "Onemocnění srdečního svalu, které ztěžuje srdci pumpovat krev do zbytku těla. Může vést k srdečnímu selhání."
+            },
         ];
 
         let filteredDiseases = [...diseases];
@@ -1597,10 +1762,16 @@
         }
 
         function setupEventListeners() {
-            // Search functionality
-            document.getElementById('searchInput').addEventListener('input', function (e) {
-                const searchTerm = e.target.value.toLowerCase();
-                filterDiseases(searchTerm, currentCategory);
+            // Search functionality with debounce
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function (e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value.trim();
+                    filterDiseases(searchTerm, currentCategory);
+                }, 300);
             });
 
             // Category filters
@@ -1627,18 +1798,79 @@
             });
         }
 
-        function filterDiseases(searchTerm, category) {
-            filteredDiseases = diseases.filter(disease => {
-                const matchesSearch = !searchTerm ||
-                    disease.name.toLowerCase().includes(searchTerm) ||
-                    disease.category.toLowerCase().includes(searchTerm) ||
-                    disease.symptoms.some(symptom => symptom.toLowerCase().includes(searchTerm)) ||
-                    disease.description.toLowerCase().includes(searchTerm);
+        // Initialize Fuse.js with diseases data
+        if (typeof diseases !== 'undefined') {
+            fuse = new Fuse(diseases, fuseOptions);
+        }
 
-                const matchesCategory = category === 'all' || disease.category === category;
-
-                return matchesSearch && matchesCategory;
+        function searchDiseases(term) {
+            if (!term || term.trim() === '') return [...diseases];
+            
+            const normalizedTerm = term.toLowerCase().trim();
+            const results = [];
+            const seen = new Set();
+            
+            // 1. Check for exact matches first
+            const exactMatches = fuse.search(normalizedTerm, { limit: 50 });
+            
+            // 2. Check for synonym matches
+            let synonymTerms = [];
+            Object.entries(searchSynonyms).forEach(([key, synonyms]) => {
+                if (normalizedTerm.includes(key)) {
+                    synonymTerms = [...synonymTerms, ...synonyms];
+                }
+                synonyms.forEach(synonym => {
+                    if (normalizedTerm.includes(synonym)) {
+                        synonymTerms.push(key);
+                    }
+                });
             });
+            
+            // 3. Combine all search terms
+            const allSearchTerms = [normalizedTerm, ...new Set(synonymTerms)];
+            
+            // 4. Search for each term and combine results
+            allSearchTerms.forEach(searchTerm => {
+                const searchResults = fuse.search(searchTerm, { limit: 50 });
+                searchResults.forEach(result => {
+                    if (!seen.has(result.item.name)) {
+                        seen.add(result.item.name);
+                        results.push(result.item);
+                    }
+                });
+            });
+            
+            return results.length > 0 ? results : [];
+        }
+        
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^\w\s]/gi, '');
+        }
+        
+        function filterDiseases(searchTerm, category) {
+            // If no search term, show all diseases in the current category
+            if (!searchTerm || searchTerm.trim() === '') {
+                filteredDiseases = [...diseases];
+            } else {
+                // Simple search that works with the current data structure
+                const searchLower = searchTerm.toLowerCase();
+                filteredDiseases = diseases.filter(disease => {
+                    return disease.name.toLowerCase().includes(searchLower) ||
+                           disease.category.toLowerCase().includes(searchLower) ||
+                           disease.description.toLowerCase().includes(searchLower) ||
+                           (disease.symptoms && disease.symptoms.some(s => s.toLowerCase().includes(searchLower))) ||
+                           (disease.causes && disease.causes.some(c => c.toLowerCase().includes(searchLower)));
+                });
+            }
+            
+            // Apply category filter
+            if (category !== 'all') {
+                filteredDiseases = filteredDiseases.filter(disease => disease.category === category);
+            }
 
             updateDiseaseCount();
             renderDiseases();
