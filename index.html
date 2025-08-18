@@ -190,6 +190,15 @@
 
     <!-- Disease Grid -->
     <main class="container mx-auto px-4 py-8">
+        <!-- Sekce s kategoriemi -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Procházet podle kategorií</h2>
+            <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+                <!-- Kategorie budou naplněny JavaScriptem -->
+            </div>
+        </section>
+
+        <h2 class="text-2xl font-bold mb-6">Všechny nemoci</h2>
         <div id="diseaseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Diseases will be populated by JavaScript -->
         </div>
@@ -2199,6 +2208,36 @@
         // Initialize Fuse.js with diseases data
         if (typeof diseases !== 'undefined') {
             fuse = new Fuse(diseases, fuseOptions);
+            
+            // Získání unikátních kategorií
+            const categories = new Set();
+            diseases.forEach(disease => {
+                if (disease && disease.category) {
+                    const cats = disease.category.split('/').map(cat => cat.trim());
+                    cats.forEach(cat => categories.add(cat));
+                }
+            });
+            
+            // Zobrazení kategorií
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            if (categoriesGrid) {
+                categoriesGrid.innerHTML = Array.from(categories).map(category => {
+                    const filename = category
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-+|-+$/g, '') + '.html';
+                    
+                    return `
+                        <a href="kategorie/${filename}" class="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-100">
+                            <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center mb-2">
+                                <span class="text-primary-600 text-xl font-bold">${category.charAt(0)}</span>
+                            </div>
+                            <span class="text-sm font-medium text-center">${category}</span>
+                        </a>`;
+                }).join('');
+            }
         }
 
         function searchDiseases(term) {
