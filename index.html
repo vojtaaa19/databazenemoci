@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="cs">
 
@@ -10,6 +9,8 @@
     <meta name="keywords" content="nemoci, příznaky, léčba, prevence, zdravotní encyklopedie, diagnóza, zdraví, medicína, choroby, zdravotnictví, databazenemoci, databaze nemoci, databáze nemocí">
     <meta name="author" content="Databaze nemoci">
     <link rel="icon" type="image/png" href="disease.png">
+    <link rel="apple-touch-icon" href="disease.png">
+    <link rel="manifest" href="site.webmanifest">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <script>
@@ -577,7 +578,7 @@
                 symptoms: ["Bolest ucha", "Bolest hlavy", "Závratě", "Ztráta sluchu", "Krvácení z nosu"],
                 causes: ["Rychlá změna tlaku (potápění, létání)", "Ucpání Eustachovy trubice"],
                 treatment: ["Vyrovnání tlaku", "Nosní kapky", "Chirurgické ošetření v těžkých případech"],
-                prevention: ["Pomalé změny tlaku", "Použití ušních špuntů", "Vyhýbat se potápění při rýmě"],
+                prevention: ["Pomalé změny tlaku", "Použití ušních špuntů", "Vyhýbání se potápění při rýmě"],
                 description: "Poškození tkání způsobené rozdílem tlaku mezi vnějším prostředím a tělesnými dutinami, často při potápění nebo létání."
             },
             {
@@ -747,7 +748,7 @@
                 symptoms: ["Pálení žáhy", "Bolest na hrudi", "Dušnost", "Regurgitace"],
                 causes: ["Oslabení bránice", "Nadváha", "Těhotenství"],
                 treatment: ["Chirurgická léčba", "Dieta", "Léky na snížení kyselosti"],
-                prevention: ["Udržování zdravé hmotnosti", "Vyhýbat se zvedání těžkých břemen"],
+                prevention: ["Udržování zdravé hmotnosti", "Vyhýbání se zvedání těžkých břemen"],
                 description: "Vystoupení části žaludku do hrudníku skrz bránici."
             },
             {
@@ -1638,7 +1639,7 @@
                 symptoms: ["Žízeň", "Časté močení", "Únava", "Rozmazané vidění", "Pomalé hojení ran"],
                 causes: ["Obezita", "Nedostatek pohybu", "Genetické předpoklady", "Nevhodná strava"],
                 treatment: ["Perorální antidiabetika", "Inzulín", "Dieta", "Pravidelný pohyb"],
-                prevention: ["Zdravá strava", "Pravidelná fyzická aktivita", "Udržování zdravé hmotnosti"],
+                prevention: ["Zdravá strava", "Pravidelná fyzická aktivita", "Udržování zdravé váhy", "Pravidelné preventivní prohlídky"],
                 description: "Chronické metabolické onemocnění charakterizované zvýšenou hladinou cukru v krvi."
             },
             {
@@ -1665,21 +1666,21 @@
                 name: "Artritida",
                 category: "Ortopedické",
                 severity: "Střední",
-                symptoms: ["Bolest kloubů", "Ztuhlost", "Otoky", "Omezená pohyblivost", "Zarudnutí kůže"],
-                causes: ["Věk", "Obezita", "Genetika", "Předchozí poranění kloubů", "Infekce"],
-                treatment: ["Protizánětlivé léky", "Fyzioterapie", "Chirurgický zákrok", "Kortikosteroidy"],
-                prevention: ["Udržování zdravé hmotnosti", "Pravidelný pohyb", "Zdravá strava bohatá na antioxidanty"],
-                description: "Zánětlivé onemocnění kloubů způsobující bolest a ztuhlost, které se s věkem může zhoršovat."
+                symptoms: ["Bolest kloubů", "Ztuhlost", "Omezená pohyblivost", "Otékání"],
+                causes: ["Opotřebení kloubní chrupavky", "Věk", "Nadváha", "Poranění"],
+                treatment: ["Fyzioterapie", "Analgetika", "Chirurgická léčba (endoprotéza)"],
+                prevention: ["Udržování zdravé hmotnosti", "Pravidelný pohyb"],
+                description: "Artróza je degenerativní onemocnění kloubů způsobené opotřebením chrupavky."
             },
             {
                 name: "Deprese",
                 category: "Psychiatrické",
                 severity: "Vážná",
-                symptoms: ["Smutek", "Ztráta zájmu o koníčky", "Únava", "Poruchy spánku", "Pocity beznaděje"],
-                causes: ["Biologické faktory", "Chemie mozku", "Genetika", "Životní události", "Zdravotní problémy"],
-                treatment: ["Psychoterapie", "Antidepresiva", "Pravidelný režim", "Fyzická aktivita", "Sociální podpora"],
-                prevention: ["Zvládání stresu", "Pravidelná fyzická aktivita", "Udržování sociálních vztahů"],
-                description: "Závažná duševní porucha charakterizovaná přetrvávajícím smutkem a ztrátou zájmu o aktivity."
+                symptoms: ["Smutná nálada", "Ztráta zájmů", "Poruchy spánku", "Pocity beznaděje"],
+                causes: ["Chemická nerovnováha v mozku", "Osamělost", "Chronické onemocnění", "Genetické faktory"],
+                treatment: ["Psychoterapie", "Antidepresiva", "Sociální podpora", "Pravidelný režim"],
+                prevention: ["Sociální kontakty", "Pravidelná fyzická aktivita", "Léčba chronických onemocnění"],
+                description: "Častý, ale přehlížený problém u starších lidí, který výrazně snižuje kvalitu života."
             },
             {
                 name: "Žaludeční vředy",
@@ -1696,8 +1697,8 @@
                 category: "Respirační",
                 severity: "Střední",
                 symptoms: ["Dušnost", "Sípání", "Tlak na hrudi", "Kašel (zejména v noci)"],
-                causes: ["Alergie", "Dědičnost", "Kouření (aktivní i pasivní)", "Znečištěné ovzduší"],
-                treatment: ["Inhalační kortikosteroidy", "Bronchodilatancia", "Antileukotrieny", "Alergenová imunoterapie"],
+                causes: ["Alergeny", "Dědičnost", "Kouření (aktivní i pasivní)", "Znečištěné ovzduší"],
+                treatment: ["Inhalační kortikoidy", "Bronchodilatancia", "Antileukotrieny", "Alergenová imunoterapie"],
                 prevention: ["Vyhýbání se spouštěčům", "Pravidelné užívání léků", "Nekouřit", "Pravidelná fyzická aktivita"],
                 description: "Chronické zánětlivé onemocnění dýchacích cest způsobující zúžení průdušek a dýchací obtíže."
             },
@@ -1718,7 +1719,7 @@
                 symptoms: ["Dušnost", "Únava", "Otoky nohou a kotníků", "Nepravidelný srdeční rytmus", "Náhlý přírůstek hmotnosti"],
                 causes: ["Ischemická choroba srdeční", "Infarkt myokardu", "Vysoký krevní tlak", "Cukrovka", "Srdeční vady"],
                 treatment: ["Léky na podporu srdeční funkce", "Omezení příjmu soli", "Diuretika", "Chirurgické zákroky"],
-                prevention: ["Kontrola krevního tlaku", "Zdravá strava", "Pravidelná fyzická aktivita", "Nekouřit"],
+                prevention: ["Kontrola krevního tlaku", "Zdravá strava", "Pravidelný pohyb", "Nekouřit"],
                 description: "Stav, kdy srdce není schopno dostatečně zásobovat tělo okysličenou krví. Může být akutní nebo chronický a vyžaduje odborné lékařské vedení."
             },
             {
@@ -1785,10 +1786,10 @@
                 name: "Artritida",
                 category: "Senioři",
                 severity: "Střední",
-                symptoms: ["Bolest kloubů", "Ztuhlost kloubů", "Omezená pohyblivost", "Otoky kloubů"],
-                causes: ["Opotřebení kloubů", "Zánětlivé procesy", "Genetické faktory", "Nadváha"],
-                treatment: ["Protizánětlivé léky", "Fyzioterapie", "Kloubní náhrady", "Úprava životního stylu"],
-                prevention: ["Udržování zdravé váhy", "Pravidelný pohyb", "Správná výživa", "Šetrné zacházení s klouby"],
+                symptoms: ["Bolest kloubů", "Ztuhlost kloubů po ránu", "Omezený rozsah pohybu", "Otoky kloubů"],
+                causes: ["Opotřebení kloubní chrupavky", "Nadváha", "Přetěžování kloubů", "Genetické faktory"],
+                treatment: ["Fyzioterapie", "Léky proti bolesti", "Kloubní náhrady", "Redukce hmotnosti"],
+                prevention: ["Udržování přiměřené váhy", "Pravidelný pohyb", "Správné držení těla"],
                 description: "Zánětlivé onemocnění kloubů, které způsobuje bolest a ztuhlost. Častější u starších osob."
             },
             {
@@ -1844,309 +1845,9 @@
             {
                 name: "Chronická obstrukční plicní nemoc (CHOPN)",
                 category: "Senioři",
-                severity: "Vážná",
+                severity: "Závažná",
                 symptoms: ["Chronický kašel", "Dušnost", "Časté infekce dýchacích cest", "Sípání"],
-                causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory", "Opakované infekce plic"],
-                treatment: ["Inhalační léky", "Kyslíková terapie", "Rehabilitace", "Léčba infekcí"],
-                prevention: ["Nekouřit", "Vyhýbat se zakouřenému prostředí", "Očkování proti chřipce a pneumokokům"],
-                description: "Chronické zánětlivé onemocnění plic, které způsobuje zúžení dýchacích cest."
-            },
-            {
-                name: "Mozková mrtvice",
-                category: "Senioři",
-                severity: "Kritická",
-                symptoms: ["Pokles koutku úst", "Ochablost končetin", "Porucha řeči", "Náhlá silná bolest hlavy"],
-                causes: ["Vysoký krevní tlak", "Cukrovka", "Srdeční arytmie", "Kouření"],
-                treatment: ["Akutní léčba v nemocnici", "Rehabilitace", "Léky na ředění krve"],
-                prevention: ["Kontrola krevního tlaku", "Zdravá strava", "Pravidelný pohyb", "Nekouření"],
-                description: "Náhlá porucha krevního oběhu mozku způsobující poškození mozkové tkáně."
-            },
-            {
-                name: "Katarakta (Šedý zákal)",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Zamlžené vidění", "Obtížné vidění v noci", "Citlivost na světlo", "Změny ve vnímání barev"],
-                causes: ["Stárnutí oční čočky", "Cukrovka", "Nadměrné vystavení slunci", "Kouření"],
-                treatment: ["Chirurgické odstranění zakalené čočky", "Implantace umělé čočky"],
-                prevention: ["Ochrana očí před sluncem", "Nekouřit", "Zdravá strava bohatá na antioxidanty"],
-                description: "Zakalení oční čočky způsobující zhoršení zraku. Častý problém vyššího věku."
-            },
-            {
-                name: "Glaukom (Zelený zákal)",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Postupná ztráta periferního vidění", "Rozmazané vidění", "Bolesti očí", "Zvracení"],
-                causes: ["Zvýšený nitrooční tlak", "Genetické faktory", "Cukrovka", "Poranění oka"],
-                treatment: ["Oční kapky", "Laserová léčba", "Chirurgický zákrok"],
-                prevention: ["Pravidelné oční prohlídky", "Kontrola nitroočního tlaku", "Zdravý životní styl"],
-                description: "Skupina očních onemocnění poškozujících zrakový nerv, často spojená se zvýšeným nitroočním tlakem."
-            },
-            {
-                name: "Úbytek sluchu",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Obtížné rozumění řeči", "Časté žádosti o zopakování", "Zvýšená hlasitost TV", "Šelest v uších"],
-                causes: ["Stárnutí vnitřního ucha", "Hlukové poškození", "Infekce uší", "Některé léky"],
-                treatment: ["Naslouchátka", "Kochleární implantáty", "Komunikační techniky"],
-                prevention: ["Ochrana sluchu před hlukem", "Léčba ušních infekcí", "Vyhýbání se hlasitým zvukům"],
-                description: "Postupný úbytek sluchu související s věkem, který ztěžuje porozumění řeči a vnímání zvuků."
-            },
-            {
-                name: "Inkontinence moči",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Únik moči při kašli nebo smíchu", "Náhlé nutkání na močení", "Časté noční močení"],
-                causes: ["Oslabení pánevního dna", "Zvětšená prostata u mužů", "Nervové poškození", "Infekce močových cest"],
-                treatment: ["Cvičení pánevního dna", "Léky", "Chirurgické zákroky", "Absorpční pomůcky"],
-                prevention: ["Posilování pánevního dna", "Udržování zdravé váhy", "Omezení kofeinu a alkoholu"],
-                description: "Neúmyslný únik moči, který může výrazně ovlivnit kvalitu života starších osob."
-            },
-            {
-                name: "Osteoartróza",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Bolesti kloubů", "Ztuhlost kloubů po ránu", "Omezený rozsah pohybu", "Otoky kloubů"],
-                causes: ["Opotřebení kloubní chrupavky", "Nadváha", "Přetěžování kloubů", "Genetické faktory"],
-                treatment: ["Fyzioterapie", "Léky proti bolesti", "Kloubní náhrady", "Redukce hmotnosti"],
-                prevention: ["Udržování přiměřené váhy", "Pravidelný pohyb", "Správné držení těla"],
-                description: "Nejčastější forma artritidy způsobená opotřebením kloubní chrupavky."
-            },
-            {
-                name: "Deprese",
-                category: "Senioři",
-                severity: "Vážná",
-                symptoms: ["Smutná nálada", "Ztráta zájmů", "Poruchy spánku", "Pocity beznaděje"],
-                causes: ["Chemická nerovnováha v mozku", "Osamělost", "Chronické onemocnění", "Genetické faktory"],
-                treatment: ["Psychoterapie", "Antidepresiva", "Sociální podpora", "Pravidelný režim"],
-                prevention: ["Sociální kontakty", "Pravidelná fyzická aktivita", "Léčba chronických onemocnění"],
-                description: "Častý, ale přehlížený problém u starších lidí, který výrazně snižuje kvalitu života."
-            },
-            {
-                name: "Úzkostné poruchy",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Nadměrné obavy", "Neklid", "Podrážděnost", "Problémy se spánkem"],
-                causes: ["Stres", "Genetické faktory", "Nerovnováha chemických látek v mozku", "Životní změny"],
-                treatment: ["Kognitivně-behaviorální terapie", "Léky", "Relaxační techniky"],
-                prevention: ["Pravidelná fyzická aktivita", "Techniky zvládání stresu", "Dostatek spánku"],
-                description: "Nadměrné a přetrvávající obavy, které narušují každodenní život."
-            },
-            {
-                name: "Pády a zlomeniny",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Časté pády", "Bolesti po pádu", "Omezená pohyblivost", "Strach z pádů"],
-                causes: ["Nestabilita chůze", "Svalová slabost", "Poruchy zraku", "Nevhodné prostředí"],
-                treatment: ["Rehabilitace", "Léčba zlomenin", "Pomůcky pro chůzi"],
-                prevention: ["Cvičení na rovnováhu", "Úprava bytu", "Pravidelné kontroly zraku"],
-                description: "Pády jsou hlavní příčinou zranění a úmrtí u starších dospělých."
-            },
-            {
-                name: "Malnutrice",
-                category: "Senioři",
-                severity: "Vážná",
-                symptoms: ["Nevolnost", "Ztráta chuti k jídlu", "Úbytek hmotnosti", "Svalová slabost"],
-                causes: ["Špatné stravovací návyky", "Sociální izolace", "Chronická onemocnění", "Problémy s polykáním"],
-                treatment: ["Nutriční doplňky", "Dietní úpravy", "Léčba základního onemocnění"],
-                prevention: ["Pravidelná strava", "Dostatečný příjem bílkovin a kalorií", "Společné stolování"],
-                description: "Nedostatečná výživa, která vede k úbytku svalové hmoty a oslabení imunity."
-            },
-            {
-                name: "Chronická bolest",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Přetrvávající bolest", "Omezení pohybu", "Poruchy spánku", "Depresivní nálada"],
-                causes: ["Artritida", "Nervové poškození", "Pooperační stavy", "Migrény"],
-                treatment: ["Léky proti bolesti", "Fyzioterapie", "Akupunktura", "Psychologická podpora"],
-                prevention: ["Pravidelný pohyb", "Správné držení těla", "Řízení stresu"],
-                description: "Bolest trvající déle než 3-6 měsíců, která výrazně ovlivňuje kvalitu života."
-            },
-            {
-                name: "Spánkové poruchy",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Potíže s usínáním", "Časté buzení se", "Ranní únava", "Nekvalitní spánek"],
-                causes: ["Změny spánkového cyklu", "Léky", "Bolest", "Časté močení v noci"],
-                treatment: ["Spánková hygiena", "Léčba základní příčiny", "Léky na spaní"],
-                prevention: ["Pravidelný režim spánku", "Omezení kofeinu", "Klidné prostředí na spaní"],
-                description: "Problémy se spánkem jsou u starších osob velmi časté a mohou vést k dalším zdravotním komplikacím."
-            },
-            {
-                name: "Problémy s chůzí a mobilitou",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Nejistá chůze", "Svalová slabost", "Bolesti kloubů", "Strach z pádů"],
-                causes: ["Artritida", "Svalová atrofie", "Neurologické poruchy", "Špatný zrak"],
-                treatment: ["Fyzioterapie", "Pomůcky pro chůzi", "Léčba základního onemocnění"],
-                prevention: ["Pravidelné cvičení", "Udržování zdravé váhy", "Bezpečné prostředí"],
-                description: "Omezení pohyblivosti, které může vést k závislosti na pomoci druhých a snížení kvality života."
-            },
-            {
-                name: "Kognitivní pokles",
-                category: "Senioři",
-                severity: "Vážná",
-                symptoms: ["Zapomnětlivost", "Problémy s rozhodováním", "Zmatenost", "Ztráta pojmů"],
-                causes: ["Stárnutí mozku", "Cévní změny", "Genetické faktory", "Nedostatek stimulace"],
-                treatment: ["Kognitivní trénink", "Léky na podporu paměti", "Fyzická aktivita"],
-                prevention: ["Duševní aktivita", "Sociální kontakty", "Zdravá strava", "Pravidelný pohyb"],
-                description: "Mírný pokles kognitivních funkcí, který může, ale nemusí postupovat do demence."
-            },
-            {
-                name: "Zácpa",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Méně než tři stolice týdně", "Tvrdá stolice", "Nadýmání", "Bolesti břicha"],
-                causes: ["Nedostatek vlákniny", "Nedostatečný příjem tekutin", "Nedostatek pohybu", "Některé léky"],
-                treatment: ["Zvýšení příjmu vlákniny", "Dostatek tekutin", "Projímadla", "Pravidelný pohyb"],
-                prevention: ["Vláknitá strava", "Dostatečný pitný režim", "Pravidelná fyzická aktivita"],
-                description: "Častý problém starších lidí, který může vést k nepohodlí a dalším zdravotním komplikacím."
-            },
-            {
-                name: "Nedostatek vitaminu D",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Únava", "Bolesti kostí", "Svalová slabost", "Časté infekce"],
-                causes: ["Nedostatek slunečního záření", "Špatná absorpce živin", "Nedostatečný příjem potravou"],
-                treatment: ["Doplňky stravy s vitaminem D", "Obohacené potraviny", "Pobyt na slunci"],
-                prevention: ["Pravidelný pobyt na slunci", "Potraviny bohaté na vitamin D", "Doplnění stravy"],
-                description: "Častý problém u starších lidí, který může vést k řídnutí kostí a svalové slabosti."
-            },
-            {
-                name: "Chronické onemocnění ledvin",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Únava", "Otoky nohou", "Zvýšený krevní tlak", "Ztráta chuti k jídlu"],
-                causes: ["Cukrovka", "Vysoký krevní tlak", "Záněty ledvin", "Dlouhodobé užívání léků"],
-                treatment: ["Léčba základního onemocnění", "Dietní opatření", "Dialýza v pokročilých stádiích"],
-                prevention: ["Kontrola krevního tlaku", "Léčba cukrovky", "Dostatečný příjem tekutin"],
-                description: "Postupné zhoršování funkce ledvin, které může vést k jejich selhání."
-            },
-            {
-                name: "Chronická bronchitida",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Chronický kašel s hlenem", "Dušnost", "Sípání", "Časté infekce dýchacích cest"],
-                causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory", "Opakované infekce plic"],
-                treatment: ["Inhalační léky", "Kyslíková terapie", "Rehabilitace", "Léčba infekcí"],
-                prevention: ["Nekouřit", "Vyhýbat se zakouřenému prostředí", "Očkování proti chřipce a pneumokokům"],
-                description: "Chronický zánět průdušek, který je součástí chronické obstrukční plicní nemoci (CHOPN)."
-            },
-            {
-                name: "Mortonova neuralgie",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Pálení nebo brnění v přední části chodidla", "Bolest v oblasti prstů", "Zhoršení při chůzi"],
-                causes: ["Nošení nevhodné obuvi", "Deformity nohy", "Nadměrné přetěžování nohou"],
-                treatment: ["Výměna obuvi", "Vložky do bot", "Fyzioterapie", "Léky proti bolesti"],
-                prevention: ["Vhodná obuv s dostatkem místa pro prsty", "Vyhýbání se vysokým podpatkům"],
-                description: "Bolestivý stav postihující nervy v přední části chodidla, častější u starších žen."
-            },
-            {
-                name: "Syndrom suchého oka",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Pálení očí", "Pocit písku v očích", "Zarudnutí očí", "Rozmazané vidění"],
-                causes: ["Snížená tvorba slz", "Některé léky", "Věkem podmíněné změny", "Pobyt v suchém prostředí"],
-                treatment: ["Umělé slzy", "Mastě na oční víčka", "Léčba základního onemocnění"],
-                prevention: ["Pravidelné mrkání", "Zvlhčování vzduchu", "Ochrana očí před větrem a sluncem"],
-                description: "Stav, kdy oči nevytvářejí dostatek slz nebo slzy nejsou dostatečně kvalitní."
-            },
-            {
-                name: "Závratě a poruchy rovnováhy",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Točení hlavy", "Nejistota při chůzi", "Pocit na omdlení", "Nevolnost"],
-                causes: ["Poruchy vnitřního ucha", "Nízký krevní tlak", "Nedostatečný pitný režim", "Některé léky"],
-                treatment: ["Rehabilitační cvičení", "Léčba základní příčiny", "Úprava léků"],
-                prevention: ["Pomalé vstávání", "Dostatečný příjem tekutin", "Cvičení rovnováhy"],
-                description: "Častý problém starších lidí, který zvyšuje riziko pádů a zranění."
-            },
-            {
-                name: "Chronická žilní nedostatečnost",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Otoky nohou", "Tíha v nohách", "Křečové žíly", "Kožní změny"],
-                causes: ["Dědičné faktory", "Dlouhé stání nebo sezení", "Nadváha", "Těhotenství v anamnéze"],
-                treatment: ["Kompresní punčochy", "Léky na podporu žilního návratu", "Chirurgické řešení"],
-                prevention: ["Pravidelný pohyb", "Zdravá váha", "Vyvarování se dlouhému stání a sezení"],
-                description: "Onemocnění žil dolních končetin, které může vést k otokům a kožním změnám."
-            },
-            {
-                name: "Věkem podmíněná makulární degenerace",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Rozmazané vidění", "Pokřivené vnímání čar", "Snížená schopnost číst", "Problémy s rozpoznáváním tváří"],
-                causes: ["Stárnutí sítnice", "Kouření", "Genetické faktory", "Vysoký krevní tlak"],
-                treatment: ["Injekce do oka", "Laserová léčba", "Vizuální pomůcky", "Doplňky stravy"],
-                prevention: ["Nekouřit", "Zdravá strava bohatá na antioxidanty", "Ochrana očí před UV zářením"],
-                description: "Onemocnění sítnice způsobující ztrátu centrálního vidění. Hlavní příčina slepoty u starších osob."
-            },
-            {
-                name: "Presbyopie (Vetchozrakost)",
-                category: "Senioři",
-                severity: "Mírná",
-                symptoms: ["Potíže se čtením drobného písma", "Nutnost oddalovat čtený text", "Únava očí při čtení"],
-                causes: ["Ztráta pružnosti oční čočky související s věkem"],
-                treatment: ["Brýle na čtení", "Bifokální nebo progresivní brýle", "Kontaktní čočky"],
-                prevention: ["Nelze zcela předejít, je to přirozená součást stárnutí"],
-                description: "Věkem podmíněná ztráta schopnosti zaostřit na blízké předměty, obvykle se objevující po 40. roce věku."
-            },
-            {
-                name: "Sarkopenie (Ztráta svalové hmoty)",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Snížená svalová síla", "Obtíže se vstáváním ze židle", "Pomalá chůze", "Zvýšená únava"],
-                causes: ["Věkem podmíněný úbytek svalů", "Nedostatek pohybu", "Nedostatečný příjem bílkovin"],
-                treatment: ["Silový trénink", "Dostatečný příjem bílkovin", "Fyzioterapie"],
-                prevention: ["Pravidelná fyzická aktivita", "Dostatečný příjem bílkovin", "Vyvážená strava"],
-                description: "Postupná ztráta svalové hmoty a síly související s věkem, která může vést k pádům a zraněním."
-            },
-            {
-                name: "Osteopenie (Snížená hustota kostí)",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Obvykle bez příznaků", "Může vést k osteoporóze a zlomeninám"],
-                causes: ["Věk nad 50 let", "Nedostatek vápníku a vitaminu D", "Nedostatek pohybu", "Kouření"],
-                treatment: ["Doplňky vápníku a vitaminu D", "Cvičení s váhou vlastního těla", "Léky na podporu tvorby kostí"],
-                prevention: ["Dostatečný příjem vápníku a vitaminu D", "Pravidelná fyzická aktivita", "Nekouřit"],
-                description: "Stav, kdy je hustota kostí nižší než normální, ale ještě nedosahuje úrovně osteoporózy."
-            },
-            {
-                name: "Chronická obstrukční choroba periferních tepen",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Bolesti lýtek při chůzi", "Chladné nohy", "Špatné hojení ran na nohou", "Změna barvy kůže"],
-                causes: ["Ateroskleróza", "Kouření", "Vysoký krevní tlak", "Cukrovka"],
-                treatment: ["Léky na ředění krve", "Cvičení", "Chirurgické zákroky"],
-                prevention: ["Nekouřit", "Kontrola krevního tlaku a cukrovky", "Zdravá strava"],
-                description: "Onemocnění cév dolních končetin způsobené ukládáním tukových plátů v tepnách."
-            },
-            {
-                name: "Chronická pankreatitida",
-                category: "Senioři",
-                severity: "Vážná",
-                symptoms: ["Bolesti břicha", "Nevolnost a zvracení", "Hubnutí", "Mastná stolice"],
-                causes: ["Dlouhodobá konzumace alkoholu", "Kouření", "Genetické faktory", "Vysoká hladina tuků v krvi"],
-                treatment: ["Léky proti bolesti", "Enzymové doplňky", "Dietní opatření", "Odvykání kouření a alkoholu"],
-                prevention: ["Střídmá konzumace alkoholu", "Nekouřit", "Zdravá strava s nízkým obsahem tuků"],
-                description: "Dlouhodobý zánět slinivky břišní, který může vést k trvalému poškození tohoto orgánu."
-            },
-            {
-                name: "Chronický lymfedém",
-                category: "Senioři",
-                severity: "Střední",
-                symptoms: ["Otok končetin (obvykle nohou)", "Tíha v postižené končetině", "Ztuhlost kůže", "Opakující se infekce"],
-                causes: ["Poškození lymfatických cév", "Nádorová onemocnění", "Infekce", "Chirurgické zákroky"],
-                treatment: ["Kompresní terapie", "Manuální lymfodrenáž", "Cvičení", "Péče o kůži"],
-                prevention: ["Prevence infekcí", "Péče o kůži", "Vyhýbání se zraněním postižené končetiny"],
-                description: "Chronický otok způsobený hromaděním lymfatické tekutiny v tkáních."
-            },
-            {
-                name: "Chronická bronchitida",
-                category: "Senioři",
-                severity: "Závažná",
-                symptoms: ["Chronický kašel s hlenem", "Dušnost", "Časté infekce dýchacích cest", "Sípání"],
-                causes: ["Kouření", "Znečištěné ovzduší", "Opakované infekce dýchacích cest"],
+                causes: ["Kouření", "Znečištěné ovzduší", "Genetické faktory", "Opakované infekce dýchacích cest"],
                 treatment: ["Inhalační léky", "Rehabilitace", "Kyslíková terapie", "Léčba infekcí"],
                 prevention: ["Nekouřit", "Vyhýbat se zakouřenému prostředí", "Očkování proti chřipce a pneumokokům"],
                 description: "Chronický zánět průdušek, který je součástí chronické obstrukční plicní nemoci (CHOPN)."
