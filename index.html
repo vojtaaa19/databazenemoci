@@ -2168,49 +2168,10 @@
     </script>
 <script>
     const originalTitle = document.title;
-    const message = "👋 Vrať se zpět na web!";
-    const writeSpeed = 80;
-    const pauseTime = 1200;
-    const eraseSpeed = 40;
-    let animating = false;
-    let blurTimeout = null;
-
-    function animateTitle() {
-        let i = 0;
-        animating = true;
-
-        function write() {
-            if (!animating) return;
-            document.title = message.slice(0, i) || originalTitle;
-            if (i < message.length) {
-                i++;
-                blurTimeout = setTimeout(write, writeSpeed);
-            } else {
-                blurTimeout = setTimeout(erase, pauseTime);
-            }
-        }
-
-        function erase() {
-            if (!animating) return;
-            if (i > 0) {
-                i--;
-                document.title = message.slice(0, i) || originalTitle;
-                blurTimeout = setTimeout(erase, eraseSpeed);
-            } else {
-                blurTimeout = setTimeout(write, writeSpeed);
-            }
-        }
-
-        write();
-    }
-
     window.addEventListener('blur', () => {
-        if (!animating) animateTitle();
+        document.title = '👋 Vrať se zpět na web!';
     });
-
     window.addEventListener('focus', () => {
-        animating = false;
-        clearTimeout(blurTimeout);
         document.title = originalTitle;
     });
 </script>
