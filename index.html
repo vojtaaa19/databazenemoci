@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="cs" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Databáze nemocí</title>
+    <link rel="canonical" href="https://databazenemoci.cz/" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Databáze nemocí",
+      "url": "https://databazenemoci.cz/"
+    }
+    </script>
     <meta name="description" content="Kompletní databáze nemocí, příznaků, příčin, léčby a prevence. Zdravotní encyklopedie pro širokou veřejnost.">
     <meta name="keywords" content="nemoci, příznaky, léčba, prevence, zdravotní encyklopedie, diagnóza, zdraví, medicína, choroby, zdravotnictví, databazenemoci, databaze nemoci, databáze nemocí, symptomy, lékařství, zdravotní databáze, nemoc, nemocnice, zdravotní informace, zdravotní portál, zdravotní poradna, zdravotní web, zdravotní slovník, zdravotní rady, zdravotní příznaky, zdravotní diagnóza, zdravotní encyklopedie online, zdravotní informace zdarma, zdravotní průvodce, zdravotní potíže, zdravotní komplikace, zdravotní rizika, zdravotní prevence, zdravotní péče, zdravotní služby, zdravotní centrum, zdravotní blog, zdravotní magazín, zdravotní články, zdravotní tipy, zdravotní novinky, zdravotní otázky, zdravotní odpovědi">
     <meta name="author" content="Databaze nemoci">
@@ -32,7 +42,43 @@
         }
     </script>
     <style>
+        /* Base styles */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Accessibility focus styles */
+        *:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+        
+        /* New/Updated content indicator */
+        .new-indicator::after {
+            content: ' (Nové)';
+            font-size: 0.8em;
+            font-weight: normal;
+        }
+        
+        .updated-indicator::after {
+            content: ' (Aktualizováno)';
+            font-size: 0.8em;
+            font-weight: normal;
+            font-style: italic;
+        }
+
         /* Mobile responsiveness */
+        /* Tablet styles */
+        @media (max-width: 1024px) {
+            .disease-card {
+                padding: 1.25rem;
+            }
+            #categoriesGrid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Mobile styles */
         @media (max-width: 640px) {
             .disease-card {
                 padding: 1rem;
@@ -67,6 +113,9 @@
         }
         .disease-card {
             transition: all 0.3s ease;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
         }
 
         .disease-card:hover {
@@ -96,17 +145,16 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 min-h-screen" aria-label="Hlavní obsah">
+    <!-- Skip to main content link for screen readers -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:bg-white focus:px-4 focus:py-2 focus:rounded focus:z-50">Přeskočit na hlavní obsah</a>
     <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <img src="disease.png" alt="Logo databáze nemocí" class="w-full h-full object-contain">
                     </div>
                     <div class="cursor-pointer" onclick="window.location.href='index.html'">
                         <h1 class="font-bold text-xl text-gray-900">Zdravotní Encyklopedie</h1>
@@ -191,7 +239,7 @@
     </section>
 
     <!-- Disease Grid -->
-    <main class="container mx-auto px-4 py-8">
+    <main id="main-content" class="container mx-auto px-4 py-8" role="main" aria-label="Hlavní obsah">
         <!-- Sekce s kategoriemi -->
         <section class="mb-12">
             <div id="categoriesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
@@ -249,6 +297,23 @@
     </div>
 
     <script>
+        // Add schema.org data for diseases
+        function addDiseaseSchema(disease) {
+            return {
+                "@context": "https://schema.org",
+                "@type": "MedicalCondition",
+                "name": disease.name,
+                "alternateName": disease.name,
+                "description": `Informace o nemoci ${disease.name}: příznaky, příčiny, léčba a prevence`,
+                "signOrSymptom": Array.isArray(disease.symptoms) ? disease.symptoms.join(", ") : "",
+                "possibleTreatment": {
+                    "@type": "MedicalTherapy",
+                    "name": disease.treatment ? disease.treatment.join(", ") : "Léčba se liší podle závažnosti a typu onemocnění"
+                },
+                "status": disease.severity ? disease.severity + " závažnost" : "Střední závažnost"
+            };
+        }
+
         // Kompletní databáze nemocí (bez duplicit)
         const diseases = [
             {
@@ -1907,6 +1972,11 @@
 
         // Initialize Fuse.js with diseases data
         if (typeof diseases !== 'undefined') {
+            // Add schema data to each disease
+            diseases.forEach(disease => {
+                disease.schema = addDiseaseSchema(disease);
+            });
+            
             fuse = new Fuse(diseases, fuseOptions);
             
             // Získání unikátních kategorií
@@ -2027,20 +2097,22 @@
             noResults.classList.add('hidden');
 
             grid.innerHTML = filteredDiseases.map(disease => `
-                <div class="disease-card bg-white rounded-lg shadow-sm border border-gray-200 p-6 cursor-pointer fade-in" onclick="showDiseaseDetail('${disease.name}')">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-lg text-gray-900">${disease.name}</h3>
-                        <span class="px-2 py-1 text-xs rounded-full ${getSeverityColor(disease.severity)}">
-                            ${disease.severity}
-                        </span>
+                <div class="disease-card bg-white rounded-lg shadow-sm border border-gray-200 p-6 cursor-pointer fade-in flex flex-col h-full" onclick="showDiseaseDetail('${disease.name}')">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-lg text-gray-900 line-clamp-2" style="-webkit-line-clamp: 2;">${disease.name}</h3>
+                            <span class="px-2 py-1 text-xs rounded-full ${getSeverityColor(disease.severity)} whitespace-nowrap ml-2">
+                                ${disease.severity}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${disease.category}</p>
+                        <p class="text-gray-700 text-sm leading-relaxed mb-4 line-clamp-3" style="-webkit-line-clamp: 3;">${disease.description || ''}</p>
                     </div>
-                    <p class="text-sm text-gray-600 mb-3">${disease.category}</p>
-                    <p class="text-gray-700 text-sm leading-relaxed mb-4">${disease.description}</p>
-                    <div class="mb-4">
+                    <div class="mt-auto">
                         <h4 class="font-medium text-gray-900 mb-2 text-sm">Hlavní příznaky:</h4>
                         <div class="flex flex-wrap gap-1">
                             ${disease.symptoms.slice(0, 3).map(symptom =>
-                `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">${symptom}</span>`
+                `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded whitespace-nowrap">${symptom}</span>`
             ).join('')}
                             ${disease.symptoms.length > 3 ? `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">+${disease.symptoms.length - 3} dalších</span>` : ''}
                         </div>
@@ -2072,7 +2144,14 @@
         }
 
         function showDiseaseDetail(diseaseName) {
+            // Output schema.org data for the current disease
             const disease = diseases.find(d => d.name === diseaseName);
+            if (disease && disease.schema) {
+                const script = document.createElement('script');
+                script.type = 'application/ld+json';
+                script.textContent = JSON.stringify(disease.schema, null, 2);
+                document.head.appendChild(script);
+            }
             if (!disease) return;
 
             document.getElementById('modalTitle').textContent = disease.name;
