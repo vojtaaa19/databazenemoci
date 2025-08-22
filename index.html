@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zdravotní Encyklopedie - Kompletní databáze nemocí</title>
+    <title>Databáze nemocí</title>
     <meta name="description" content="Kompletní databáze nemocí, příznaků, příčin, léčby a prevence. Zdravotní encyklopedie pro širokou veřejnost.">
-    <meta name="keywords" content="nemoci, příznaky, léčba, prevence, zdravotní encyklopedie, diagnóza, zdraví, medicína, choroby, zdravotnictví, databazenemoci, databaze nemoci, databáze nemocí">
+    <meta name="keywords" content="nemoci, příznaky, léčba, prevence, zdravotní encyklopedie, diagnóza, zdraví, medicína, choroby, zdravotnictví, databazenemoci, databaze nemoci, databáze nemocí, symptomy, lékařství, zdravotní databáze, nemoc, nemocnice, zdravotní informace, zdravotní portál, zdravotní poradna, zdravotní web, zdravotní slovník, zdravotní rady, zdravotní příznaky, zdravotní diagnóza, zdravotní encyklopedie online, zdravotní informace zdarma, zdravotní průvodce, zdravotní potíže, zdravotní komplikace, zdravotní rizika, zdravotní prevence, zdravotní péče, zdravotní služby, zdravotní centrum, zdravotní blog, zdravotní magazín, zdravotní články, zdravotní tipy, zdravotní novinky, zdravotní otázky, zdravotní odpovědi">
     <meta name="author" content="Databaze nemoci">
     <link rel="icon" type="image/png" href="disease.png">
     <link rel="apple-touch-icon" href="disease.png">
@@ -728,7 +728,7 @@
                 symptoms: ["Tvrdé výrůstky na kůži", "Drsný povrch", "Bolest při tlaku"],
                 causes: ["Infekce lidským papilomavirem (HPV)"],
                 treatment: ["Kryoterapie", "Masti", "Chirurgické odstranění"],
-                prevention: ["Hygiena", "Vyhýbat se kontaktu s infikovanými povrchy"],
+                prevention: ["Hygiena", "Vyhýbání se kontaktu s infikovanými povrchy"],
                 description: "Nezhoubné kožní výrůstky způsobené infekcí HPV."
             },
             {
@@ -1666,11 +1666,11 @@
                 name: "Artritida",
                 category: "Ortopedické",
                 severity: "Střední",
-                symptoms: ["Bolest kloubů", "Ztuhlost", "Omezená pohyblivost", "Otékání"],
-                causes: ["Opotřebení kloubní chrupavky", "Věk", "Nadváha", "Poranění"],
-                treatment: ["Fyzioterapie", "Analgetika", "Chirurgická léčba (endoprotéza)"],
-                prevention: ["Udržování zdravé hmotnosti", "Pravidelný pohyb"],
-                description: "Artróza je degenerativní onemocnění kloubů způsobené opotřebením chrupavky."
+                symptoms: ["Bolest kloubů", "Ztuhlost kloubů po ránu", "Omezený rozsah pohybu", "Otoky kloubů"],
+                causes: ["Opotřebení kloubní chrupavky", "Nadváha", "Přetěžování kloubů", "Genetické faktory"],
+                treatment: ["Fyzioterapie", "Léky proti bolesti", "Kloubní náhrady", "Redukce hmotnosti"],
+                prevention: ["Udržování přiměřené váhy", "Pravidelný pohyb", "Správné držení těla"],
+                description: "Zánětlivé onemocnění kloubů, které způsobuje bolest a ztuhlost. Častější u starších osob."
             },
             {
                 name: "Deprese",
@@ -1716,7 +1716,7 @@
                 name: "Srdeční selhání",
                 category: "Kardiovaskulární",
                 severity: "Vážná",
-                symptoms: ["Dušnost", "Únava", "Otoky nohou a kotníků", "Nepravidelný srdeční rytmus", "Náhlý přírůstek hmotnosti"],
+                symptoms: ["Dušnost při námaze i v klidu", "Otoky nohou a kotníků", "Nadýmání břicha", "Nepravidelný srdeční rytmus", "Závratě"],
                 causes: ["Ischemická choroba srdeční", "Infarkt myokardu", "Vysoký krevní tlak", "Cukrovka", "Srdeční vady"],
                 treatment: ["Léky na podporu srdeční funkce", "Omezení příjmu soli", "Diuretika", "Chirurgické zákroky"],
                 prevention: ["Kontrola krevního tlaku", "Zdravá strava", "Pravidelný pohyb", "Nekouřit"],
@@ -1778,7 +1778,7 @@
                 severity: "Vážná",
                 symptoms: ["Zhoršení paměti", "Problémy s vyjadřováním", "Ztráta časoprostorové orientace", "Změny osobnosti"],
                 causes: ["Alzheimerova choroba", "Cévní mozkové příhody", "Parkinsonova choroba", "Genetické faktory"],
-                treatment: ["Léky na zpomalení progrese", "Kognitivní trénink", "Podpůrná terapie", "Péče o celkové zdraví"],
+                treatment: ["Léky na zpomalení progrese", "Kognitivní trénink", "Podpora rodiny", "Péče o celkové zdraví"],
                 prevention: ["Duševní aktivita", "Zdravá strava", "Pravidelný pohyb", "Kontrola krevního tlaku a cholesterolu"],
                 description: "Soubor příznaků způsobených poškozením mozku, které vede k postupnému zhoršování kognitivních funkcí."
             },
@@ -2166,6 +2166,54 @@
             }
         });
     </script>
+<script>
+    const originalTitle = document.title;
+    const message = "👋 Vrať se zpět na web!";
+    const writeSpeed = 80;
+    const pauseTime = 1200;
+    const eraseSpeed = 40;
+    let animating = false;
+    let blurTimeout = null;
+
+    function animateTitle() {
+        let i = 0;
+        animating = true;
+
+        function write() {
+            if (!animating) return;
+            document.title = message.slice(0, i) || originalTitle;
+            if (i < message.length) {
+                i++;
+                blurTimeout = setTimeout(write, writeSpeed);
+            } else {
+                blurTimeout = setTimeout(erase, pauseTime);
+            }
+        }
+
+        function erase() {
+            if (!animating) return;
+            if (i > 0) {
+                i--;
+                document.title = message.slice(0, i) || originalTitle;
+                blurTimeout = setTimeout(erase, eraseSpeed);
+            } else {
+                blurTimeout = setTimeout(write, writeSpeed);
+            }
+        }
+
+        write();
+    }
+
+    window.addEventListener('blur', () => {
+        if (!animating) animateTitle();
+    });
+
+    window.addEventListener('focus', () => {
+        animating = false;
+        clearTimeout(blurTimeout);
+        document.title = originalTitle;
+    });
+</script>
 </body>
 
 </html>
